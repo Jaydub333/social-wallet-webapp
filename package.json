@@ -1,0 +1,13 @@
+{
+  "name": "social-wallet-webapp",
+  "version": "1.0.0",
+  "description": "Social media webapp for Social Wallet users",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 8000"
+  },
+  "keywords": ["social-wallet", "webapp", "social-media"],
+  "author": "Social Wallet",
+  "license": "MIT"
+}

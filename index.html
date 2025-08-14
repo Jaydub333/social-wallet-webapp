@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Wallet - Your Universal Profile</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-wallet"></i>
+                <span>Social Wallet</span>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-link active" data-page="dashboard">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                <a href="#" class="nav-link" data-page="profile">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="#" class="nav-link" data-page="media">
+                    <i class="fas fa-images"></i> Media
+                </a>
+                <a href="#" class="nav-link" data-page="gifts">
+                    <i class="fas fa-gift"></i> Gifts
+                </a>
+            </nav>
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <span class="username">Guest User</span>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Authentication Screen -->
+            <div id="auth-screen" class="screen active">
+                <div class="auth-container">
+                    <div class="auth-header">
+                        <h1><i class="fas fa-wallet"></i> Social Wallet</h1>
+                        <p>Your universal profile for all platforms</p>
+                    </div>
+                    
+                    <div class="auth-card">
+                        <h2>Welcome Back!</h2>
+                        <p>Connect with your Social Wallet to manage your universal profile</p>
+                        
+                        <button class="btn-primary btn-large" onclick="authenticateWithSocialWallet()">
+                            <i class="fas fa-wallet"></i>
+                            Continue with Social Wallet
+                        </button>
+                        
+                        <div class="divider">or</div>
+                        
+                        <button class="btn-secondary" onclick="loginAsGuest()">
+                            <i class="fas fa-user"></i>
+                            Continue as Guest
+                        </button>
+                    </div>
+                    
+                    <div class="features">
+                        <div class="feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Verified Profile</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-sync"></i>
+                            <span>Cross-Platform Sync</span>
+                        </div>
+                        <div class="feature">
+                            <i class="fas fa-gift"></i>
+                            <span>Universal Gifts</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Screen -->
+            <div id="dashboard-screen" class="screen">
+                <div class="dashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-users"></i>
+                            <div class="stat-content">
+                                <h3 id="connected-platforms">3</h3>
+                                <p>Connected Platforms</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-images"></i>
+                            <div class="stat-content">
+                                <h3 id="total-media">12</h3>
+                                <p>Media Items</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-gift"></i>
+                            <div class="stat-content">
+                                <h3 id="gifts-received">25</h3>
+                                <p>Gifts Received</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-coins"></i>
+                            <div class="stat-content">
+                                <h3 id="wallet-balance">1,250</h3>
+                                <p>Wallet Balance</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity">
+                        <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                        <div class="activity-list" id="activity-list">
+                            <!-- Activity items will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Screen -->
+            <div id="profile-screen" class="screen">
+                <div class="profile-section">
+                    <h2><i class="fas fa-user"></i> Profile Management</h2>
+                    
+                    <div class="profile-form">
+                        <div class="form-group">
+                            <label>Display Name</label>
+                            <input type="text" id="display-name" placeholder="Your display name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" id="username" placeholder="@username">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Bio</label>
+                            <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input type="text" id="location" placeholder="City, Country">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Website</label>
+                            <input type="url" id="website" placeholder="https://your-website.com">
+                        </div>
+                        
+                        <button class="btn-primary" onclick="saveProfile()">
+                            <i class="fas fa-save"></i> Save Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Screen -->
+            <div id="media-screen" class="screen">
+                <div class="media-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-images"></i> Media Library</h2>
+                        <button class="btn-primary" onclick="openUploadModal()">
+                            <i class="fas fa-plus"></i> Add Media
+                        </button>
+                    </div>
+                    
+                    <div class="media-grid" id="media-grid">
+                        <!-- Media items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gifts Screen -->
+            <div id="gifts-screen" class="screen">
+                <div class="gifts-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-gift"></i> Gift Center</h2>
+                        <div class="wallet-balance">
+                            <i class="fas fa-coins"></i>
+                            <span id="current-balance">1,250 coins</span>
+                        </div>
+                    </div>
+                    
+                    <div class="gift-catalog">
+                        <h3>Available Gifts</h3>
+                        <div class="gift-grid" id="gift-catalog">
+                            <!-- Gift items will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="gift-history">
+                        <h3>Recent Gifts</h3>
+                        <div class="gift-list" id="gift-history">
+                            <!-- Gift history will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-upload"></i> Upload Media</h3>
+                <button class="close-btn" onclick="closeUploadModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="upload-area">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Drag & drop files here or click to browse</p>
+                    <input type="file" id="file-input" multiple accept="image/*,video/*">
+                </div>
+                <div class="form-group">
+                    <label>Caption</label>
+                    <textarea id="media-caption" placeholder="Add a caption..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Tags</label>
+                    <input type="text" id="media-tags" placeholder="Add tags (comma separated)">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                <button class="btn-primary" onclick="uploadMedia()">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Connecting to Social Wallet API...</p>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
