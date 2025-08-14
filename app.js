@@ -467,12 +467,17 @@ function renderPosts(posts) {
 function createPostHTML(post) {
   const timeAgo = formatTimeAgo(post.createdAt);
   const isLiked = post.isLiked || false;
+  const authorName = post.author.displayName || post.author.name;
+  
+  // Use author's profile image if available, otherwise generate avatar
+  const authorAvatar = post.author.profileImage || 
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=667eea&color=fff`;
   
   return `
     <div class="post-card" data-post-id="${post.id}">
       <div class="post-header">
         <div class="user-avatar">
-          <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.displayName || post.author.name)}&background=667eea&color=fff" alt="${post.author.displayName || post.author.name}">
+          <img src="${authorAvatar}" alt="${authorName}">
         </div>
         <div class="post-user-info">
           <div class="post-user-name">${post.author.displayName || post.author.name}</div>
@@ -513,7 +518,7 @@ function createPostHTML(post) {
       <div class="post-comments" id="comments-${post.id}" style="display: none;">
         <div class="comment-input-container">
           <div class="user-avatar">
-            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(appState.currentUser?.displayName || 'User')}&background=667eea&color=fff" alt="You">
+            <img src="${appState.currentUser?.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(appState.currentUser?.displayName || 'User')}&background=667eea&color=fff`}" alt="You">
           </div>
           <input type="text" class="comment-input" placeholder="Write a comment..." 
                  onkeypress="handleCommentKeyPress(event, '${post.id}')">
@@ -750,6 +755,151 @@ function reportPost(postId) {
   }
 }
 
+// Profile Picture Functions
+let selectedProfilePictureFile = null;
+
+function openProfilePictureModal() {
+  const modal = document.getElementById('profile-picture-modal');
+  modal.classList.add('active');
+  
+  // Show current avatar
+  if (appState.currentUser) {
+    const currentAvatarUrl = appState.currentUser.profileImage || 
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(appState.currentUser.displayName)}&background=667eea&color=fff&size=120`;
+    document.getElementById('current-avatar-preview').src = currentAvatarUrl;
+  }
+  
+  // Reset upload state
+  resetProfilePictureUpload();
+}
+
+function closeProfilePictureModal() {
+  document.getElementById('profile-picture-modal').classList.remove('active');
+  resetProfilePictureUpload();
+}
+
+function resetProfilePictureUpload() {
+  selectedProfilePictureFile = null;
+  document.getElementById('profile-picture-input').value = '';
+  document.getElementById('new-avatar-preview').style.display = 'none';
+  document.getElementById('preview-image').src = '';
+}
+
+function selectProfilePicture() {
+  document.getElementById('profile-picture-input').click();
+}
+
+// Add event listener for profile picture input
+document.addEventListener('DOMContentLoaded', () => {
+  const profilePictureInput = document.getElementById('profile-picture-input');
+  if (profilePictureInput) {
+    profilePictureInput.addEventListener('change', handleProfilePictureSelect);
+  }
+});
+
+function handleProfilePictureSelect(event) {
+  const file = event.target.files[0];
+  
+  if (!file) return;
+  
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    showToast('Please select an image file', 'error');
+    return;
+  }
+  
+  // Validate file size (5MB max)
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Image size must be less than 5MB', 'error');
+    return;
+  }
+  
+  selectedProfilePictureFile = file;
+  
+  // Preview the image
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('preview-image').src = e.target.result;
+    document.getElementById('new-avatar-preview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function cancelProfilePicture() {
+  resetProfilePictureUpload();
+}
+
+async function saveProfilePicture() {
+  if (!selectedProfilePictureFile) {
+    showToast('Please select an image first', 'error');
+    return;
+  }
+  
+  showLoading('Uploading profile picture...');
+  
+  try {
+    // Convert file to base64 for storage (in a real app, you'd upload to cloud storage)
+    const reader = new FileReader();
+    const base64Promise = new Promise((resolve) => {
+      reader.onload = (e) => resolve(e.target.result);
+      reader.readAsDataURL(selectedProfilePictureFile);
+    });
+    
+    const base64Image = await base64Promise;
+    
+    // Update profile with new image
+    const profileData = {
+      displayName: appState.currentUser.displayName,
+      bio: appState.currentUser.bio,
+      location: appState.currentUser.location,
+      website: appState.currentUser.website,
+      profileImage: base64Image,
+      userId: appState.currentUser.id
+    };
+    
+    const response = await APIService.updateProfile(profileData);
+    
+    if (response.success) {
+      // Update current user state
+      appState.setUser({ ...appState.currentUser, profileImage: base64Image });
+      
+      // Update all avatar images in the UI
+      updateAllAvatars(base64Image);
+      
+      closeProfilePictureModal();
+      showToast('Profile picture updated successfully!', 'success');
+      
+      // Reload profile to show changes
+      await loadUserProfile();
+    } else {
+      throw new Error(response.error || 'Failed to update profile picture');
+    }
+    
+  } catch (error) {
+    console.error('Profile picture update error:', error);
+    showToast('Failed to update profile picture: ' + error.message, 'error');
+  } finally {
+    hideLoading();
+  }
+}
+
+function updateAllAvatars(imageUrl) {
+  // Update all instances of user avatar throughout the app
+  const avatarElements = [
+    'nav-user-avatar',
+    'sidebar-avatar', 
+    'profile-avatar',
+    'composer-avatar'
+  ];
+  
+  avatarElements.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.src = imageUrl;
+    }
+  });
+}
+
 // Profile Functions
 async function loadUserProfile() {
   if (!appState.currentUser) return;
@@ -923,12 +1073,16 @@ async function loadNotifications() {
 function updateUserInfo(user) {
   if (!user) return;
   
-  const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=667eea&color=fff`;
+  // Use custom profile image if available, otherwise generate avatar
+  const avatarUrl = user.profileImage || 
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName)}&background=667eea&color=fff`;
   
   // Update all user avatars and info
   const elements = {
     'nav-user-avatar': avatarUrl,
     'sidebar-avatar': avatarUrl,
+    'profile-avatar': avatarUrl,
+    'composer-avatar': avatarUrl,
     'sidebar-name': user.displayName,
     'sidebar-username': `@${user.username}`
   };

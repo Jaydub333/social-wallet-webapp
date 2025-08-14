@@ -809,6 +809,88 @@ h3 { font-size: 1.25rem; }
   cursor: pointer;
 }
 
+/* Profile Picture Upload Styles */
+.profile-picture-upload {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  align-items: start;
+}
+
+.current-avatar {
+  text-align: center;
+}
+
+.current-avatar img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--border-color);
+  margin-bottom: var(--spacing-sm);
+}
+
+.current-avatar p {
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.upload-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.upload-area-profile {
+  border: 2px dashed var(--border-color);
+  border-radius: 12px;
+  padding: var(--spacing-xl);
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  background: var(--background-color);
+}
+
+.upload-area-profile:hover {
+  border-color: var(--primary-color);
+  background: rgba(29, 161, 242, 0.05);
+}
+
+.upload-area-profile i {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: var(--spacing-sm);
+  display: block;
+}
+
+.upload-area-profile p {
+  font-weight: 500;
+  margin-bottom: var(--spacing-xs);
+}
+
+.upload-area-profile small {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.new-avatar-preview {
+  text-align: center;
+}
+
+.new-avatar-preview img {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-color);
+  margin-bottom: var(--spacing-md);
+  object-fit: cover;
+}
+
+.preview-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
 .profile-details {
   margin-left: 140px;
   padding-top: var(--spacing-sm);
@@ -1177,6 +1259,16 @@ h3 { font-size: 1.25rem; }
   
   .profile-stats {
     justify-content: center;
+  }
+  
+  .profile-picture-upload {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+  
+  .current-avatar,
+  .upload-section {
+    text-align: center;
   }
 }
 

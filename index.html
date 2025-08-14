@@ -227,7 +227,7 @@
                     <div class="profile-info">
                         <div class="profile-avatar">
                             <img id="profile-avatar" src="https://via.placeholder.com/120" alt="Profile">
-                            <button class="change-avatar-btn">
+                            <button class="change-avatar-btn" onclick="openProfilePictureModal()">
                                 <i class="fas fa-camera"></i>
                             </button>
                         </div>
@@ -422,6 +422,51 @@
                         <button type="submit" class="btn-primary">Save Changes</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Picture Modal -->
+    <div id="profile-picture-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Change Profile Picture</h3>
+                <button class="btn-close" onclick="closeProfilePictureModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="profile-picture-upload">
+                    <div class="current-avatar">
+                        <img id="current-avatar-preview" src="https://via.placeholder.com/120" alt="Current">
+                        <p>Current Picture</p>
+                    </div>
+                    
+                    <div class="upload-section">
+                        <div class="upload-area-profile" onclick="selectProfilePicture()">
+                            <i class="fas fa-camera"></i>
+                            <p>Click to upload new picture</p>
+                            <small>JPG, PNG or GIF (max 5MB)</small>
+                        </div>
+                        
+                        <input type="file" id="profile-picture-input" accept="image/*" style="display: none;">
+                        
+                        <div id="new-avatar-preview" class="new-avatar-preview" style="display: none;">
+                            <img id="preview-image" src="" alt="Preview">
+                            <div class="preview-actions">
+                                <button class="btn-secondary" onclick="cancelProfilePicture()">
+                                    <i class="fas fa-times"></i>
+                                    Cancel
+                                </button>
+                                <button class="btn-primary" onclick="saveProfilePicture()">
+                                    <i class="fas fa-check"></i>
+                                    Save Picture
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
