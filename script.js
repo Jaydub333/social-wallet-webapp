@@ -41,34 +41,51 @@ function setupEventListeners() {
         });
     });
 
-    // Upload area
+    // Upload area (safely check if elements exist)
     const uploadArea = document.getElementById('upload-area');
     const fileInput = document.getElementById('file-input');
 
-    uploadArea.addEventListener('click', () => fileInput.click());
-    uploadArea.addEventListener('dragover', handleDragOver);
-    uploadArea.addEventListener('dragleave', handleDragLeave);
-    uploadArea.addEventListener('drop', handleDrop);
-    fileInput.addEventListener('change', handleFileSelect);
+    if (uploadArea && fileInput) {
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+    }
 
-    // Modal close on background click
-    document.getElementById('upload-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'upload-modal') {
-            closeUploadModal();
-        }
-    });
+    // Post media input
+    const postMediaInput = document.getElementById('post-media-input');
+    if (postMediaInput) {
+        postMediaInput.addEventListener('change', handlePostMediaSelect);
+    }
+
+    // Modal close on background click (safely check if elements exist)
+    const uploadModal = document.getElementById('upload-modal');
+    if (uploadModal) {
+        uploadModal.addEventListener('click', (e) => {
+            if (e.target.id === 'upload-modal') {
+                closeUploadModal();
+            }
+        });
+    }
     
-    document.getElementById('create-post-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'create-post-modal') {
-            closeCreatePostModal();
-        }
-    });
+    const createPostModal = document.getElementById('create-post-modal');
+    if (createPostModal) {
+        createPostModal.addEventListener('click', (e) => {
+            if (e.target.id === 'create-post-modal') {
+                closeCreatePostModal();
+            }
+        });
+    }
     
-    document.getElementById('signup-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'signup-modal') {
-            closeSignupModal();
-        }
-    });
+    const signupModal = document.getElementById('signup-modal');
+    if (signupModal) {
+        signupModal.addEventListener('click', (e) => {
+            if (e.target.id === 'signup-modal') {
+                closeSignupModal();
+            }
+        });
+    }
 }
 
 // Authentication Functions
@@ -128,7 +145,14 @@ function loginAsGuest() {
 
 // Signup Functions
 function openSignupModal() {
-    document.getElementById('signup-modal').classList.add('active');
+    const modal = document.getElementById('signup-modal');
+    if (modal) {
+        modal.classList.add('active');
+        console.log('Signup modal opened');
+    } else {
+        console.error('Signup modal not found');
+        showToast('Error: Signup form not available', 'error');
+    }
 }
 
 function closeSignupModal() {
@@ -218,14 +242,6 @@ async function handleSignup(event) {
     }
 }
 
-// Close modal on background click
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('signup-modal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'signup-modal') {
-            closeSignupModal();
-        }
-    });
-});
 
 function logout() {
     localStorage.removeItem('socialWalletUser');
@@ -791,15 +807,35 @@ function loadExplorePage() {
 // Create Post Functions
 function openCreatePostModal(type = 'text') {
     const modal = document.getElementById('create-post-modal');
-    modal.classList.add('active');
-    
-    // Update user info
-    if (currentUser) {
-        document.querySelector('.post-username').textContent = currentUser.displayName;
+    if (modal) {
+        modal.classList.add('active');
+        
+        // Update user info
+        if (currentUser) {
+            const usernameEl = document.querySelector('.post-username');
+            if (usernameEl) {
+                usernameEl.textContent = currentUser.displayName || 'User';
+            }
+        }
+        
+        // If opening for photo, automatically trigger file picker
+        if (type === 'photo') {
+            setTimeout(() => {
+                addPostMedia();
+            }, 300);
+        }
+        
+        // Focus on content area
+        const contentArea = document.getElementById('post-content');
+        if (contentArea) {
+            contentArea.focus();
+        }
+        
+        console.log('Create post modal opened for type:', type);
+    } else {
+        console.error('Create post modal not found');
+        showToast('Error: Post creation not available', 'error');
     }
-    
-    // Focus on content area
-    document.getElementById('post-content').focus();
 }
 
 function closeCreatePostModal() {
@@ -813,7 +849,43 @@ function closeCreatePostModal() {
 }
 
 function addPostMedia() {
-    document.getElementById('post-media-input').click();
+    const mediaInput = document.getElementById('post-media-input');
+    if (mediaInput) {
+        mediaInput.click();
+    }
+}
+
+function handlePostMediaSelect(event) {
+    const files = event.target.files;
+    const previewContainer = document.getElementById('post-media-preview');
+    
+    if (files.length > 0 && previewContainer) {
+        const file = files[0];
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            previewContainer.innerHTML = `
+                <div style="position: relative; display: inline-block;">
+                    <img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                    <button onclick="clearPostMedia()" style="position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 12px;">×</button>
+                </div>
+            `;
+            previewContainer.style.display = 'block';
+        };
+        
+        reader.readAsDataURL(file);
+    }
+}
+
+function clearPostMedia() {
+    const mediaInput = document.getElementById('post-media-input');
+    const previewContainer = document.getElementById('post-media-preview');
+    
+    if (mediaInput) mediaInput.value = '';
+    if (previewContainer) {
+        previewContainer.innerHTML = '';
+        previewContainer.style.display = 'none';
+    }
 }
 
 function addPostPoll() {
