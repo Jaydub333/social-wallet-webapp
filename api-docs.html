@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Wallet API Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #fff;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #1da1f2;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #1da1f2;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            font-weight: 300;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        .toc h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .toc ul {
+            list-style: none;
+            columns: 2;
+            column-gap: 40px;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+            break-inside: avoid;
+        }
+
+        .toc a {
+            color: #1da1f2;
+            text-decoration: none;
+            display: block;
+            padding: 5px 0;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #1da1f2;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e1e8ed;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 1.3rem;
+            margin: 30px 0 15px 0;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.1rem;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e1e8ed;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #1da1f2;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .warning-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .api-endpoint {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .api-endpoint h4 {
+            margin-top: 0;
+            color: #28a745;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #e1e8ed;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .method-get { color: #28a745; font-weight: bold; }
+        .method-post { color: #007bff; font-weight: bold; }
+        .method-put { color: #ffc107; font-weight: bold; }
+        .method-delete { color: #dc3545; font-weight: bold; }
+
+        .footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e1e8ed;
+            text-align: center;
+            color: #666;
+        }
+
+        @media print {
+            .container {
+                max-width: none;
+                padding: 20px;
+            }
+            
+            .toc ul {
+                columns: 1;
+            }
+            
+            .section {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Social Wallet API</h1>
+            <div class="subtitle">Developer Integration Guide</div>
+        </div>
+
+        <div class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#getting-started">2. Getting Started</a></li>
+                <li><a href="#authentication">3. Authentication</a></li>
+                <li><a href="#api-endpoints">4. API Endpoints</a></li>
+                <li><a href="#data-models">5. Data Models</a></li>
+                <li><a href="#code-examples">6. Code Examples</a></li>
+                <li><a href="#error-handling">7. Error Handling</a></li>
+                <li><a href="#best-practices">8. Best Practices</a></li>
+                <li><a href="#rate-limiting">9. Rate Limiting</a></li>
+                <li><a href="#support">10. Support</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="overview">
+            <h2>1. Overview</h2>
+            <p>The Social Wallet API is a powerful backend service that enables developers to build social media applications with universal profile management, cross-platform compatibility, and comprehensive social features.</p>
+            
+            <div class="info-box">
+                <strong>Base URL:</strong> https://squid-app-mky7a.ondigitalocean.app<br>
+                <strong>Version:</strong> 2.0.0<br>
+                <strong>Protocol:</strong> HTTPS REST API
+            </div>
+
+            <h3>Key Features</h3>
+            <ul>
+                <li><strong>Universal Profiles:</strong> Centralized user profile management</li>
+                <li><strong>Social Media Functions:</strong> Posts, comments, likes, and sharing</li>
+                <li><strong>Cross-Platform Integration:</strong> Works with any frontend technology</li>
+                <li><strong>Real-time Data:</strong> Live updates for social interactions</li>
+                <li><strong>Scalable Architecture:</strong> Enterprise-grade performance</li>
+                <li><strong>RESTful Design:</strong> Standard HTTP methods and responses</li>
+            </ul>
+        </div>
+
+        <div class="section" id="getting-started">
+            <h2>2. Getting Started</h2>
+            
+            <h3>Prerequisites</h3>
+            <ul>
+                <li>Basic knowledge of REST APIs</li>
+                <li>HTTP client capability (fetch, axios, curl, etc.)</li>
+                <li>Understanding of JSON data format</li>
+            </ul>
+
+            <h3>Quick Start Guide</h3>
+            <ol>
+                <li>Test API connectivity with the health endpoint</li>
+                <li>Create a user account</li>
+                <li>Start making posts and interactions</li>
+                <li>Build your frontend interface</li>
+            </ol>
+
+            <div class="api-endpoint">
+                <h4>Health Check</h4>
+                <div class="code-block">
+GET /health
+
+Response:
+{
+  "status": "OK",
+  "healthy": true,
+  "uptime": 12345.67,
+  "database": {
+    "users": 15,
+    "posts": 42,
+    "comments": 89,
+    "likes": 156
+  }
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="authentication">
+            <h2>3. Authentication</h2>
+            <p>The Social Wallet API currently uses a simplified authentication model for development and demonstration purposes. Most endpoints require a <code>userId</code> parameter to identify the acting user.</p>
+
+            <div class="warning-box">
+                <strong>Development Note:</strong> In production, implement proper OAuth 2.0 or JWT authentication with your security requirements.
+            </div>
+
+            <div class="code-block">
+// Example request with user identification
+{
+  "userId": "user_001",
+  "content": "Hello, Social Wallet!"
+}
+            </div>
+        </div>
+
+        <div class="section" id="api-endpoints">
+            <h2>4. API Endpoints</h2>
+
+            <h3>Base Information</h3>
+            
+            <div class="api-endpoint">
+                <h4><span class="method-get">GET</span> /</h4>
+                <p>Get API information and available endpoints.</p>
+                <div class="code-block">
+GET https://squid-app-mky7a.ondigitalocean.app/
+
+Response:
+{
+  "success": true,
+  "message": "🚀 Social Wallet API is LIVE with Database!",
+  "version": "2.0.0",
+  "status": "Working perfectly",
+  "endpoints": {
+    "users": "/api/users",
+    "posts": "/api/posts",
+    "comments": "/api/comments",
+    "likes": "/api/likes"
+  }
+}
+                </div>
+            </div>
+
+            <h3>User Management</h3>
+
+            <div class="api-endpoint">
+                <h4><span class="method-post">POST</span> /api/users</h4>
+                <p>Create a new user account.</p>
+                <div class="code-block">
+Request:
+{
+  "displayName": "John Doe",
+  "username": "johndoe",
+  "email": "john@example.com",
+  "bio": "Software developer and tech enthusiast",
+  "location": "San Francisco, CA",
+  "website": "https://johndoe.dev"
+}
+
+Response:
+{
+  "success": true,
+  "message": "User created successfully",
+  "user": {
+    "id": "user_abc123",
+    "username": "johndoe",
+    "displayName": "John Doe",
+    "email": "john@example.com",
+    "bio": "Software developer and tech enthusiast",
+    "verified": false,
+    "createdAt": "2025-08-14T18:07:06.631Z"
+  }
+}
+                </div>
+            </div>
+
+            <div class="highlight">
+                <strong>Validation Rules:</strong>
+                <ul>
+                    <li><code>displayName</code>: Required, 1-50 characters</li>
+                    <li><code>username</code>: Required, 3-20 characters, alphanumeric and underscore only</li>
+                    <li><code>email</code>: Required, valid email format</li>
+                    <li><code>bio</code>: Optional, max 160 characters</li>
+                </ul>
+            </div>
+
+            <div class="api-endpoint">
+                <h4><span class="method-get">GET</span> /api/users</h4>
+                <p>Get all users (public profiles only).</p>
+            </div>
+
+            <h3>Profile Management</h3>
+
+            <div class="api-endpoint">
+                <h4><span class="method-get">GET</span> /api/profile</h4>
+                <p>Get detailed user profile information.</p>
+                <div class="code-block">
+GET /api/profile?userId=user_001
+
+Response:
+{
+  "success": true,
+  "profile": {
+    "id": "user_001",
+    "username": "demo_user",
+    "displayName": "Demo User",
+    "bio": "Social Wallet demo user",
+    "postsCount": 5,
+    "followersCount": 0,
+    "followingCount": 0
+  }
+}
+                </div>
+            </div>
+
+            <div class="api-endpoint">
+                <h4><span class="method-put">PUT</span> /api/profile</h4>
+                <p>Update user profile information.</p>
+                <div class="code-block">
+Request:
+{
+  "userId": "user_001",
+  "displayName": "Updated Name",
+  "bio": "Updated bio text",
+  "location": "New York, NY",
+  "profileImage": "data:image/jpeg;base64,..."
+}
+                </div>
+            </div>
+
+            <h3>Posts Management</h3>
+
+            <div class="api-endpoint">
+                <h4><span class="method-get">GET</span> /api/posts</h4>
+                <p>Retrieve all posts with author information, comments, and likes.</p>
+                <div class="code-block">
+Response:
+{
+  "success": true,
+  "posts": [
+    {
+      "id": "post_001",
+      "userId": "user_001",
+      "content": "Welcome to Social Wallet! 🚀",
+      "hashtags": ["SocialWallet", "Welcome"],
+      "likes": 5,
+      "createdAt": "2025-08-14T14:30:00.000Z",
+      "author": {
+        "id": "user_001",
+        "username": "demo_user",
+        "displayName": "Demo User"
+      },
+      "commentsCount": 1,
+      "likesCount": 5
+    }
+  ]
+}
+                </div>
+            </div>
+
+            <div class="api-endpoint">
+                <h4><span class="method-post">POST</span> /api/posts</h4>
+                <p>Create a new post.</p>
+                <div class="code-block">
+Request:
+{
+  "userId": "user_001",
+  "content": "Just built an amazing app! #coding #socialwallet",
+  "media": "https://example.com/image.jpg"
+}
+
+Response:
+{
+  "success": true,
+  "message": "Post created successfully",
+  "post": {
+    "id": "post_new123",
+    "userId": "user_001",
+    "content": "Just built an amazing app! #coding #socialwallet",
+    "hashtags": ["coding", "socialwallet"],
+    "createdAt": "2025-08-14T18:30:00.000Z"
+  }
+}
+                </div>
+            </div>
+
+            <h3>Comments Management</h3>
+
+            <div class="api-endpoint">
+                <h4><span class="method-post">POST</span> /api/posts/:postId/comments</h4>
+                <p>Add a comment to a specific post.</p>
+                <div class="code-block">
+Request:
+{
+  "userId": "user_001",
+  "content": "Great post! Thanks for sharing this."
+}
+
+Response:
+{
+  "success": true,
+  "message": "Comment added successfully",
+  "comment": {
+    "id": "comment_new123",
+    "postId": "post_001",
+    "userId": "user_001",
+    "content": "Great post! Thanks for sharing this."
+  }
+}
+                </div>
+            </div>
+
+            <h3>Likes Management</h3>
+
+            <div class="api-endpoint">
+                <h4><span class="method-post">POST</span> /api/posts/:postId/like</h4>
+                <p>Toggle like status on a post (like if not liked, unlike if already liked).</p>
+                <div class="code-block">
+Request:
+{
+  "userId": "user_001"
+}
+
+Response:
+{
+  "success": true,
+  "message": "Post liked",
+  "liked": true
+}
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="code-examples">
+            <h2>6. Code Examples</h2>
+
+            <h3>JavaScript/Node.js Integration</h3>
+            <div class="code-block">
+class SocialWalletAPI {
+  constructor(baseURL = 'https://squid-app-mky7a.ondigitalocean.app') {
+    this.baseURL = baseURL;
+  }
+
+  async request(endpoint, options = {}) {
+    const url = `${this.baseURL}${endpoint}`;
+    const config = {
+      headers: { 'Content-Type': 'application/json' },
+      ...options
+    };
+
+    const response = await fetch(url, config);
+    const data = await response.json();
+    return data;
+  }
+
+  async createUser(userData) {
+    return this.request('/api/users', {
+      method: 'POST',
+      body: JSON.stringify(userData)
+    });
+  }
+
+  async createPost(postData) {
+    return this.request('/api/posts', {
+      method: 'POST',
+      body: JSON.stringify(postData)
+    });
+  }
+}
+
+// Usage
+const api = new SocialWalletAPI();
+
+// Create user
+const newUser = await api.createUser({
+  displayName: "Jane Developer",
+  username: "janedev",
+  email: "jane@dev.com"
+});
+
+// Create post
+await api.createPost({
+  userId: newUser.user.id,
+  content: "Hello Social Wallet! 🚀 #coding"
+});
+            </div>
+
+            <h3>React Integration Example</h3>
+            <div class="code-block">
+import React, { useState, useEffect } from 'react';
+
+function SocialFeed() {
+  const [posts, setPosts] = useState([]);
+  const api = new SocialWalletAPI();
+
+  useEffect(() => {
+    loadPosts();
+  }, []);
+
+  const loadPosts = async () => {
+    const response = await api.request('/api/posts');
+    if (response.success) {
+      setPosts(response.posts);
+    }
+  };
+
+  return (
+    &lt;div className="social-feed"&gt;
+      {posts.map(post =&gt; (
+        &lt;div key={post.id} className="post-card"&gt;
+          &lt;h4&gt;{post.author.displayName}&lt;/h4&gt;
+          &lt;p&gt;{post.content}&lt;/p&gt;
+          &lt;span&gt;❤️ {post.likesCount}&lt;/span&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+            </div>
+
+            <h3>cURL Examples</h3>
+            <div class="code-block">
+# Create User
+curl -X POST https://squid-app-mky7a.ondigitalocean.app/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "displayName": "API Tester",
+    "username": "apitester",
+    "email": "test@api.com"
+  }'
+
+# Get Posts
+curl https://squid-app-mky7a.ondigitalocean.app/api/posts
+
+# Create Post
+curl -X POST https://squid-app-mky7a.ondigitalocean.app/api/posts \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": "user_001",
+    "content": "Testing API with cURL! #testing"
+  }'
+            </div>
+        </div>
+
+        <div class="section" id="error-handling">
+            <h2>7. Error Handling</h2>
+
+            <h3>Standard Error Response</h3>
+            <div class="code-block">
+{
+  "success": false,
+  "error": "Descriptive error message"
+}
+            </div>
+
+            <h3>HTTP Status Codes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Meaning</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>200</td>
+                        <td>OK</td>
+                        <td>Request successful</td>
+                    </tr>
+                    <tr>
+                        <td>201</td>
+                        <td>Created</td>
+                        <td>Resource created successfully</td>
+                    </tr>
+                    <tr>
+                        <td>400</td>
+                        <td>Bad Request</td>
+                        <td>Invalid request data</td>
+                    </tr>
+                    <tr>
+                        <td>409</td>
+                        <td>Conflict</td>
+                        <td>Resource already exists</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>Internal Server Error</td>
+                        <td>Server error</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section" id="best-practices">
+            <h2>8. Best Practices</h2>
+
+            <h3>API Integration Guidelines</h3>
+            <ul>
+                <li><strong>Connection Management:</strong> Always test API connectivity before main operations</li>
+                <li><strong>Data Validation:</strong> Validate all user input before sending to API</li>
+                <li><strong>Error Handling:</strong> Implement comprehensive error handling and user feedback</li>
+                <li><strong>Performance:</strong> Use caching for frequently accessed data</li>
+                <li><strong>Security:</strong> Sanitize user input and use HTTPS for all requests</li>
+            </ul>
+
+            <div class="highlight">
+                <strong>Performance Tip:</strong> Implement client-side caching to reduce API calls and improve user experience.
+            </div>
+        </div>
+
+        <div class="section" id="support">
+            <h2>10. Support</h2>
+
+            <h3>Getting Help</h3>
+            <ul>
+                <li><strong>Live API:</strong> https://squid-app-mky7a.ondigitalocean.app</li>
+                <li><strong>Example App:</strong> https://coruscating-pixie-0c117e.netlify.app</li>
+                <li><strong>GitHub:</strong> https://github.com/Jaydub333/social-wallet-api2</li>
+            </ul>
+
+            <h3>Frequently Asked Questions</h3>
+            <div class="info-box">
+                <strong>Q: Is authentication required?</strong><br>
+                Currently, the API uses userId parameters. Implement proper authentication on your frontend for production use.
+            </div>
+
+            <div class="info-box">
+                <strong>Q: What's the rate limit?</strong><br>
+                Reasonable rate limits are in place: 100 requests/minute, 10 user creations/hour, 20 posts/hour per user.
+            </div>
+        </div>
+
+        <div class="footer">
+            <h3>Social Wallet API Documentation</h3>
+            <p>Version 2.0.0 | Last Updated: August 2025</p>
+            <p>Built with ❤️ for developers by the Social Wallet team</p>
+        </div>
+    </div>
+
+    <script>
+        // Add click handlers for table of contents
+        document.querySelectorAll('.toc a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Print functionality
+        function printDoc() {
+            window.print();
+        }
+
+        // Add print button
+        const printBtn = document.createElement('button');
+        printBtn.textContent = '📄 Print/Save as PDF';
+        printBtn.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1da1f2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            z-index: 1000;
+        `;
+        printBtn.onclick = printDoc;
+        document.body.appendChild(printBtn);
+    </script>
+</body>
+</html>
