@@ -54,6 +54,18 @@ function setupEventListeners() {
             closeUploadModal();
         }
     });
+    
+    document.getElementById('create-post-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'create-post-modal') {
+            closeCreatePostModal();
+        }
+    });
+    
+    document.getElementById('signup-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'signup-modal') {
+            closeSignupModal();
+        }
+    });
 }
 
 // Authentication Functions
@@ -110,6 +122,107 @@ function loginAsGuest() {
     showAuthenticatedView();
     showToast('Welcome, Guest User!', 'success');
 }
+
+// Signup Functions
+function openSignupModal() {
+    document.getElementById('signup-modal').classList.add('active');
+}
+
+function closeSignupModal() {
+    document.getElementById('signup-modal').classList.remove('active');
+    
+    // Reset form
+    document.getElementById('signup-form').reset();
+}
+
+async function handleSignup(event) {
+    if (event) {
+        event.preventDefault();
+    }
+    
+    // Get form data
+    const displayName = document.getElementById('signup-display-name').value.trim();
+    const username = document.getElementById('signup-username').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const bio = document.getElementById('signup-bio').value.trim();
+    const location = document.getElementById('signup-location').value.trim();
+    const website = document.getElementById('signup-website').value.trim();
+    const termsAccepted = document.getElementById('signup-terms').checked;
+    
+    // Validation
+    if (!displayName || !username || !email) {
+        showToast('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    if (!termsAccepted) {
+        showToast('Please accept the Terms of Service', 'error');
+        return;
+    }
+    
+    // Validate username format
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        showToast('Username can only contain letters, numbers, and underscores', 'error');
+        return;
+    }
+    
+    showLoading('Creating your account...');
+    
+    try {
+        const userData = {
+            displayName,
+            username,
+            email,
+            bio,
+            location,
+            website
+        };
+        
+        const response = await fetch(`${API_BASE}/api/users`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Set as current user
+            currentUser = {
+                ...data.user,
+                joinDate: data.user.createdAt
+            };
+            
+            localStorage.setItem('socialWalletUser', JSON.stringify(currentUser));
+            
+            closeSignupModal();
+            showAuthenticatedView();
+            showToast('Account created successfully! Welcome to Social Wallet!', 'success');
+        } else {
+            throw new Error(data.error || 'Failed to create account');
+        }
+    } catch (error) {
+        console.error('Signup error:', error);
+        if (error.message.includes('username')) {
+            showToast('Username already taken. Please choose another.', 'error');
+        } else {
+            showToast('Failed to create account: ' + error.message, 'error');
+        }
+    } finally {
+        hideLoading();
+    }
+}
+
+// Close modal on background click
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('signup-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'signup-modal') {
+            closeSignupModal();
+        }
+    });
+});
 
 function logout() {
     localStorage.removeItem('socialWalletUser');

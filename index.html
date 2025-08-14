@@ -73,6 +73,11 @@
                             <i class="fas fa-user"></i>
                             Continue as Guest
                         </button>
+                        
+                        <button class="btn-secondary" onclick="openSignupModal()" style="margin-top: 16px;">
+                            <i class="fas fa-user-plus"></i>
+                            Create New Account
+                        </button>
                     </div>
                     
                     <div class="features">
@@ -375,6 +380,64 @@
     <div id="loading-overlay" class="loading-overlay">
         <div class="spinner"></div>
         <p>Connecting to Social Wallet API...</p>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signup-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-user-plus"></i> Create Account</h3>
+                <button class="close-btn" onclick="closeSignupModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="signup-form" onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label>Display Name *</label>
+                        <input type="text" id="signup-display-name" required placeholder="Your full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Username *</label>
+                        <input type="text" id="signup-username" required placeholder="@username" pattern="[a-zA-Z0-9_]+">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="signup-email" required placeholder="your.email@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="signup-bio" placeholder="Tell us about yourself..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="signup-location" placeholder="City, Country">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Website</label>
+                        <input type="url" id="signup-website" placeholder="https://your-website.com">
+                    </div>
+                    
+                    <div class="form-group" style="margin-top: 24px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+                            <input type="checkbox" id="signup-terms" required>
+                            I agree to the Terms of Service and Privacy Policy
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeSignupModal()">Cancel</button>
+                <button class="btn-primary" onclick="handleSignup(event)">
+                    <i class="fas fa-user-plus"></i> Create Account
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Toast Notifications -->
