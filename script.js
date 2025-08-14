@@ -18,6 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
+    // Clear any old data for fresh start (temporary for debugging)
+    localStorage.removeItem('socialWalletUser');
+    
     // Check if user is already authenticated
     const savedUser = localStorage.getItem('socialWalletUser');
     if (savedUser) {
