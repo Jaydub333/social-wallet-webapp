@@ -245,26 +245,38 @@ async function saveProfile() {
         username: document.getElementById('username').value,
         bio: document.getElementById('bio').value,
         location: document.getElementById('location').value,
-        website: document.getElementById('website').value
+        website: document.getElementById('website').value,
+        userId: currentUser?.id || 'user_001'
     };
     
     showLoading('Saving profile...');
     
     try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const response = await fetch(`${API_BASE}/api/profile`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(profileData)
+        });
         
-        // Update current user
-        Object.assign(currentUser, profileData);
-        localStorage.setItem('socialWalletUser', JSON.stringify(currentUser));
+        const data = await response.json();
         
-        // Update header
-        document.querySelector('.username').textContent = currentUser.displayName;
-        
-        showToast('Profile updated successfully!', 'success');
+        if (data.success) {
+            // Update current user
+            Object.assign(currentUser, profileData);
+            localStorage.setItem('socialWalletUser', JSON.stringify(currentUser));
+            
+            // Update header
+            document.querySelector('.username').textContent = currentUser.displayName;
+            
+            showToast('Profile updated successfully!', 'success');
+        } else {
+            throw new Error(data.error || 'Failed to save profile');
+        }
     } catch (error) {
         console.error('Profile save error:', error);
-        showToast('Failed to save profile', 'error');
+        showToast('Failed to save profile: ' + error.message, 'error');
     } finally {
         hideLoading();
     }
