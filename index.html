@@ -3,439 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Social Wallet - Your Universal Profile</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="style.css" rel="stylesheet">
+    <title>Social Wallet - Connect. Share. Grow.</title>
+    <meta name="description" content="The universal social media platform powered by Social Wallet API">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link href="styles.css" rel="stylesheet">
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="logo">
+<body class="theme-light">
+    <!-- Loading Screen -->
+    <div id="app-loader" class="loader-overlay">
+        <div class="loader-content">
+            <div class="loader-icon">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <div class="loader-text">Social Wallet</div>
+            <div class="loader-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Authentication Screen -->
+    <div id="auth-container" class="auth-screen">
+        <div class="auth-content">
+            <div class="auth-header">
+                <div class="logo">
+                    <i class="fas fa-wallet"></i>
+                    <span>Social Wallet</span>
+                </div>
+                <h1>Connect. Share. Grow.</h1>
+                <p>Your universal social media platform</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account</p>
+                
+                <form onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" required placeholder="your@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </button>
+                </form>
+                
+                <div class="auth-switch">
+                    <p>Don't have an account? <a href="#" onclick="switchToSignup()">Sign up</a></p>
+                    <p><a href="#" onclick="loginAsGuest()">Continue as Guest</a></p>
+                </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="auth-form">
+                <h2>Create Account</h2>
+                <p>Join our community</p>
+                
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="signup-firstname">First Name</label>
+                            <input type="text" id="signup-firstname" required placeholder="John">
+                        </div>
+                        <div class="form-group">
+                            <label for="signup-lastname">Last Name</label>
+                            <input type="text" id="signup-lastname" required placeholder="Doe">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-username">Username</label>
+                        <input type="text" id="signup-username" required placeholder="@johndoe" pattern="[a-zA-Z0-9_]+" minlength="3">
+                        <small>Letters, numbers, and underscores only</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" required placeholder="your@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" required placeholder="••••••••" minlength="6">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signup-bio">Bio (Optional)</label>
+                        <textarea id="signup-bio" placeholder="Tell us about yourself..." rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-checkbox">
+                        <input type="checkbox" id="signup-terms" required>
+                        <label for="signup-terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </button>
+                </form>
+                
+                <div class="auth-switch">
+                    <p>Already have an account? <a href="#" onclick="switchToLogin()">Sign in</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app-container" class="app-container hidden">
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="nav-brand">
                 <i class="fas fa-wallet"></i>
                 <span>Social Wallet</span>
             </div>
-            <nav class="nav">
-                <a href="#" class="nav-link active" data-page="dashboard">
-                    <i class="fas fa-home"></i> Dashboard
+            
+            <div class="nav-menu">
+                <a href="#" data-page="feed" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
                 </a>
-                <a href="#" class="nav-link" data-page="profile">
-                    <i class="fas fa-user"></i> Profile
+                <a href="#" data-page="explore" class="nav-link">
+                    <i class="fas fa-compass"></i>
+                    <span>Explore</span>
                 </a>
-                <a href="#" class="nav-link" data-page="media">
-                    <i class="fas fa-images"></i> Media
+                <a href="#" data-page="notifications" class="nav-link">
+                    <i class="fas fa-bell"></i>
+                    <span>Notifications</span>
+                    <span class="notification-badge">3</span>
                 </a>
-                <a href="#" class="nav-link" data-page="feed">
-                    <i class="fas fa-home"></i> Feed
+                <a href="#" data-page="messages" class="nav-link">
+                    <i class="fas fa-envelope"></i>
+                    <span>Messages</span>
                 </a>
-                <a href="#" class="nav-link" data-page="explore">
-                    <i class="fas fa-compass"></i> Explore
+                <a href="#" data-page="profile" class="nav-link">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
                 </a>
-                <a href="#" class="nav-link" data-page="gifts">
-                    <i class="fas fa-gift"></i> Gifts
-                </a>
-            </nav>
-            <div class="user-info">
-                <div class="user-avatar">
-                    <i class="fas fa-user-circle"></i>
+            </div>
+            
+            <button class="create-post-btn" onclick="openCreatePostModal()">
+                <i class="fas fa-plus"></i>
+                <span>Post</span>
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Feed Page -->
+            <div id="feed-page" class="page active">
+                <div class="page-header">
+                    <h1>Home Feed</h1>
+                    <div class="page-actions">
+                        <button class="btn-icon" onclick="refreshFeed()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
                 </div>
-                <span class="username">Guest User</span>
-                <button class="btn-logout" onclick="logout()">
+
+                <!-- Quick Post -->
+                <div class="quick-post">
+                    <div class="user-avatar">
+                        <img id="nav-user-avatar" src="https://via.placeholder.com/40" alt="You">
+                    </div>
+                    <input type="text" placeholder="What's happening?" onclick="openCreatePostModal()" readonly>
+                    <div class="quick-actions">
+                        <button onclick="openCreatePostModal('image')"><i class="fas fa-image"></i></button>
+                        <button onclick="openCreatePostModal('video')"><i class="fas fa-video"></i></button>
+                        <button onclick="openCreatePostModal('poll')"><i class="fas fa-poll"></i></button>
+                    </div>
+                </div>
+
+                <!-- Posts Feed -->
+                <div id="posts-feed" class="posts-feed">
+                    <!-- Posts will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Explore Page -->
+            <div id="explore-page" class="page">
+                <div class="page-header">
+                    <h1>Explore</h1>
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search posts, users, hashtags...">
+                    </div>
+                </div>
+
+                <div class="explore-content">
+                    <div class="trending-section">
+                        <h3>Trending</h3>
+                        <div id="trending-topics" class="trending-topics"></div>
+                    </div>
+
+                    <div class="users-section">
+                        <h3>Suggested Users</h3>
+                        <div id="suggested-users" class="suggested-users"></div>
+                    </div>
+
+                    <div class="popular-section">
+                        <h3>Popular Posts</h3>
+                        <div id="popular-posts" class="popular-posts"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile-page" class="page">
+                <div class="profile-header">
+                    <div class="profile-cover"></div>
+                    <div class="profile-info">
+                        <div class="profile-avatar">
+                            <img id="profile-avatar" src="https://via.placeholder.com/120" alt="Profile">
+                            <button class="change-avatar-btn">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                        <div class="profile-details">
+                            <h1 id="profile-name">Loading...</h1>
+                            <p id="profile-username">@loading</p>
+                            <p id="profile-bio">Loading bio...</p>
+                            <div class="profile-stats">
+                                <div class="stat">
+                                    <span class="stat-value" id="posts-count">0</span>
+                                    <span class="stat-label">Posts</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value" id="followers-count">0</span>
+                                    <span class="stat-label">Followers</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-value" id="following-count">0</span>
+                                    <span class="stat-label">Following</span>
+                                </div>
+                            </div>
+                            <button class="btn-secondary" onclick="openEditProfileModal()">
+                                <i class="fas fa-edit"></i>
+                                Edit Profile
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-tabs">
+                    <button class="tab-btn active" data-tab="posts">Posts</button>
+                    <button class="tab-btn" data-tab="media">Media</button>
+                    <button class="tab-btn" data-tab="likes">Likes</button>
+                </div>
+
+                <div class="profile-content">
+                    <div id="profile-posts" class="tab-content active"></div>
+                    <div id="profile-media" class="tab-content"></div>
+                    <div id="profile-likes" class="tab-content"></div>
+                </div>
+            </div>
+
+            <!-- Other pages... -->
+            <div id="notifications-page" class="page">
+                <div class="page-header">
+                    <h1>Notifications</h1>
+                </div>
+                <div class="notifications-list">
+                    <div class="notification-item">
+                        <i class="fas fa-heart text-red"></i>
+                        <div class="notification-content">
+                            <p><strong>Sarah</strong> liked your post</p>
+                            <span class="notification-time">2 minutes ago</span>
+                        </div>
+                    </div>
+                    <!-- More notifications... -->
+                </div>
+            </div>
+
+            <div id="messages-page" class="page">
+                <div class="page-header">
+                    <h1>Messages</h1>
+                </div>
+                <div class="messages-placeholder">
+                    <i class="fas fa-envelope"></i>
+                    <h3>Messages coming soon</h3>
+                    <p>Direct messaging will be available in a future update</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="sidebar">
+            <div class="user-card">
+                <img id="sidebar-avatar" src="https://via.placeholder.com/48" alt="You">
+                <div class="user-details">
+                    <div class="user-name" id="sidebar-name">Loading...</div>
+                    <div class="user-handle" id="sidebar-username">@loading</div>
+                </div>
+                <button class="btn-icon" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
                 </button>
             </div>
-        </div>
-    </header>
 
-    <!-- Main Content -->
-    <main class="main">
-        <div class="container">
-            <!-- Authentication Screen -->
-            <div id="auth-screen" class="screen active">
-                <div class="auth-container">
-                    <div class="auth-header">
-                        <h1><i class="fas fa-wallet"></i> Social Wallet</h1>
-                        <p>Your universal profile for all platforms</p>
-                    </div>
-                    
-                    <div class="auth-card">
-                        <h2>Welcome Back!</h2>
-                        <p>Connect with your Social Wallet to manage your universal profile</p>
-                        
-                        <button class="btn-primary btn-large" onclick="authenticateWithSocialWallet()">
-                            <i class="fas fa-wallet"></i>
-                            Continue with Social Wallet
-                        </button>
-                        
-                        <div class="divider">or</div>
-                        
-                        <button class="btn-secondary" onclick="loginAsGuest()">
-                            <i class="fas fa-user"></i>
-                            Continue as Guest
-                        </button>
-                        
-                        <button class="btn-secondary" onclick="openSignupModal()" style="margin-top: 16px;">
-                            <i class="fas fa-user-plus"></i>
-                            Create New Account
-                        </button>
-                    </div>
-                    
-                    <div class="features">
-                        <div class="feature">
-                            <i class="fas fa-shield-alt"></i>
-                            <span>Verified Profile</span>
-                        </div>
-                        <div class="feature">
-                            <i class="fas fa-sync"></i>
-                            <span>Cross-Platform Sync</span>
-                        </div>
-                        <div class="feature">
-                            <i class="fas fa-gift"></i>
-                            <span>Universal Gifts</span>
-                        </div>
-                    </div>
-                </div>
+            <div class="trending-widget">
+                <h3>Trending Now</h3>
+                <div id="sidebar-trending" class="trending-list"></div>
             </div>
 
-            <!-- Dashboard Screen -->
-            <div id="dashboard-screen" class="screen">
-                <div class="dashboard">
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <i class="fas fa-users"></i>
-                            <div class="stat-content">
-                                <h3 id="connected-platforms">3</h3>
-                                <p>Connected Platforms</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-images"></i>
-                            <div class="stat-content">
-                                <h3 id="total-media">12</h3>
-                                <p>Media Items</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-gift"></i>
-                            <div class="stat-content">
-                                <h3 id="gifts-received">25</h3>
-                                <p>Gifts Received</p>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-coins"></i>
-                            <div class="stat-content">
-                                <h3 id="wallet-balance">1,250</h3>
-                                <p>Wallet Balance</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="recent-activity">
-                        <h3><i class="fas fa-clock"></i> Recent Activity</h3>
-                        <div class="activity-list" id="activity-list">
-                            <!-- Activity items will be loaded here -->
-                        </div>
-                    </div>
-                </div>
+            <div class="suggested-widget">
+                <h3>Who to Follow</h3>
+                <div id="sidebar-suggestions" class="suggestions-list"></div>
             </div>
-
-            <!-- Profile Screen -->
-            <div id="profile-screen" class="screen">
-                <div class="profile-section">
-                    <h2><i class="fas fa-user"></i> Profile Management</h2>
-                    
-                    <div class="profile-form">
-                        <div class="form-group">
-                            <label>Display Name</label>
-                            <input type="text" id="display-name" placeholder="Your display name">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Username</label>
-                            <input type="text" id="username" placeholder="@username">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Bio</label>
-                            <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Location</label>
-                            <input type="text" id="location" placeholder="City, Country">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Website</label>
-                            <input type="url" id="website" placeholder="https://your-website.com">
-                        </div>
-                        
-                        <button class="btn-primary" onclick="saveProfile()">
-                            <i class="fas fa-save"></i> Save Profile
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Media Screen -->
-            <div id="media-screen" class="screen">
-                <div class="media-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-images"></i> Media Library</h2>
-                        <button class="btn-primary" onclick="openUploadModal()">
-                            <i class="fas fa-plus"></i> Add Media
-                        </button>
-                    </div>
-                    
-                    <div class="media-grid" id="media-grid">
-                        <!-- Media items will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Social Feed Screen -->
-            <div id="feed-screen" class="screen">
-                <div class="feed-container">
-                    <!-- Create Post Section -->
-                    <div class="create-post-card">
-                        <div class="create-post-header">
-                            <div class="user-avatar-small">
-                                <i class="fas fa-user-circle"></i>
-                            </div>
-                            <input type="text" class="post-input" placeholder="What's on your mind?" onclick="openCreatePostModal()">
-                        </div>
-                        <div class="create-post-actions">
-                            <button class="post-action-btn" onclick="openCreatePostModal('photo')">
-                                <i class="fas fa-image"></i> Photo
-                            </button>
-                            <button class="post-action-btn" onclick="openCreatePostModal('video')">
-                                <i class="fas fa-video"></i> Video
-                            </button>
-                            <button class="post-action-btn" onclick="openCreatePostModal('poll')">
-                                <i class="fas fa-poll"></i> Poll
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Posts Feed -->
-                    <div class="posts-feed" id="posts-feed">
-                        <!-- Posts will be loaded here -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Explore Screen -->
-            <div id="explore-screen" class="screen">
-                <div class="explore-container">
-                    <div class="explore-header">
-                        <h2><i class="fas fa-compass"></i> Explore</h2>
-                        <div class="search-bar">
-                            <i class="fas fa-search"></i>
-                            <input type="text" placeholder="Search users, hashtags..." id="search-input">
-                        </div>
-                    </div>
-
-                    <!-- Trending Section -->
-                    <div class="trending-section">
-                        <h3>Trending</h3>
-                        <div class="trending-list" id="trending-list">
-                            <!-- Trending topics will be loaded here -->
-                        </div>
-                    </div>
-
-                    <!-- Suggested Users -->
-                    <div class="suggested-users">
-                        <h3>Suggested for You</h3>
-                        <div class="users-grid" id="suggested-users">
-                            <!-- Suggested users will be loaded here -->
-                        </div>
-                    </div>
-
-                    <!-- Popular Posts -->
-                    <div class="popular-posts">
-                        <h3>Popular Posts</h3>
-                        <div class="posts-grid" id="popular-posts">
-                            <!-- Popular posts will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gifts Screen -->
-            <div id="gifts-screen" class="screen">
-                <div class="gifts-section">
-                    <div class="section-header">
-                        <h2><i class="fas fa-gift"></i> Gift Center</h2>
-                        <div class="wallet-balance">
-                            <i class="fas fa-coins"></i>
-                            <span id="current-balance">1,250 coins</span>
-                        </div>
-                    </div>
-                    
-                    <div class="gift-catalog">
-                        <h3>Available Gifts</h3>
-                        <div class="gift-grid" id="gift-catalog">
-                            <!-- Gift items will be loaded here -->
-                        </div>
-                    </div>
-                    
-                    <div class="gift-history">
-                        <h3>Recent Gifts</h3>
-                        <div class="gift-list" id="gift-history">
-                            <!-- Gift history will be loaded here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
+        </aside>
+    </div>
 
     <!-- Create Post Modal -->
     <div id="create-post-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-plus"></i> Create Post</h3>
-                <button class="close-btn" onclick="closeCreatePostModal()">
+                <h3>Create Post</h3>
+                <button class="btn-close" onclick="closeCreatePostModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            
             <div class="modal-body">
-                <div class="post-creator-header">
-                    <div class="user-avatar-small">
-                        <i class="fas fa-user-circle"></i>
+                <div class="post-composer">
+                    <div class="composer-header">
+                        <img id="composer-avatar" src="https://via.placeholder.com/48" alt="You">
+                        <div class="composer-user">
+                            <div class="composer-name" id="composer-name">Loading...</div>
+                            <select class="privacy-selector">
+                                <option value="public">🌍 Public</option>
+                                <option value="followers">👥 Followers</option>
+                                <option value="private">🔒 Private</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="user-info-small">
-                        <span class="post-username">Demo User</span>
-                        <div class="privacy-selector">
-                            <i class="fas fa-globe"></i>
-                            <span>Public</span>
+                    
+                    <textarea id="post-content" placeholder="What's happening?" rows="4"></textarea>
+                    
+                    <div id="media-preview" class="media-preview"></div>
+                    
+                    <div class="composer-actions">
+                        <div class="media-actions">
+                            <input type="file" id="media-input" multiple accept="image/*,video/*" style="display: none;">
+                            <button type="button" onclick="selectMedia()">
+                                <i class="fas fa-image"></i>
+                                Photo/Video
+                            </button>
+                            <button type="button" onclick="createPoll()">
+                                <i class="fas fa-poll"></i>
+                                Poll
+                            </button>
+                            <button type="button" onclick="addLocation()">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Location
+                            </button>
+                        </div>
+                        
+                        <div class="post-actions">
+                            <div class="character-count">
+                                <span id="char-count">0</span>/280
+                            </div>
+                            <button type="button" class="btn-primary" onclick="submitPost()">
+                                <i class="fas fa-paper-plane"></i>
+                                Post
+                            </button>
                         </div>
                     </div>
                 </div>
-                
-                <textarea id="post-content" placeholder="What's happening?"></textarea>
-                
-                <div class="post-media-preview" id="post-media-preview" style="display: none;">
-                    <!-- Media preview will show here -->
-                </div>
-                
-                <div class="post-options">
-                    <button class="post-option-btn" onclick="addPostMedia()">
-                        <i class="fas fa-image"></i> Add Photo/Video
-                    </button>
-                    <button class="post-option-btn" onclick="addPostPoll()">
-                        <i class="fas fa-poll"></i> Create Poll
-                    </button>
-                    <button class="post-option-btn" onclick="addPostLocation()">
-                        <i class="fas fa-map-marker-alt"></i> Add Location
-                    </button>
-                </div>
-                
-                <input type="file" id="post-media-input" multiple accept="image/*,video/*" style="display: none;">
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeCreatePostModal()">Cancel</button>
-                <button class="btn-primary" onclick="createPost()">
-                    <i class="fas fa-paper-plane"></i> Post
-                </button>
             </div>
         </div>
     </div>
 
-    <!-- Upload Modal -->
-    <div id="upload-modal" class="modal">
+    <!-- Edit Profile Modal -->
+    <div id="edit-profile-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-upload"></i> Upload Media</h3>
-                <button class="close-btn" onclick="closeUploadModal()">
+                <h3>Edit Profile</h3>
+                <button class="btn-close" onclick="closeEditProfileModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+            
             <div class="modal-body">
-                <div class="upload-area" id="upload-area">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                    <p>Drag & drop files here or click to browse</p>
-                    <input type="file" id="file-input" multiple accept="image/*,video/*">
-                </div>
-                <div class="form-group">
-                    <label>Caption</label>
-                    <textarea id="media-caption" placeholder="Add a caption..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Tags</label>
-                    <input type="text" id="media-tags" placeholder="Add tags (comma separated)">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
-                <button class="btn-primary" onclick="uploadMedia()">
-                    <i class="fas fa-upload"></i> Upload
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="loading-overlay">
-        <div class="spinner"></div>
-        <p>Connecting to Social Wallet API...</p>
-    </div>
-
-    <!-- Signup Modal -->
-    <div id="signup-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-user-plus"></i> Create Account</h3>
-                <button class="close-btn" onclick="closeSignupModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="signup-form" onsubmit="handleSignup(event)">
+                <form onsubmit="updateProfile(event)">
                     <div class="form-group">
-                        <label>Display Name *</label>
-                        <input type="text" id="signup-display-name" required placeholder="Your full name">
+                        <label for="edit-display-name">Display Name</label>
+                        <input type="text" id="edit-display-name" required>
                     </div>
                     
                     <div class="form-group">
-                        <label>Username *</label>
-                        <input type="text" id="signup-username" required placeholder="@username" pattern="[a-zA-Z0-9_]+">
+                        <label for="edit-bio">Bio</label>
+                        <textarea id="edit-bio" rows="3" maxlength="160"></textarea>
+                        <small>160 characters max</small>
                     </div>
                     
                     <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="signup-email" required placeholder="your.email@example.com">
+                        <label for="edit-location">Location</label>
+                        <input type="text" id="edit-location" placeholder="City, Country">
                     </div>
                     
                     <div class="form-group">
-                        <label>Bio</label>
-                        <textarea id="signup-bio" placeholder="Tell us about yourself..."></textarea>
+                        <label for="edit-website">Website</label>
+                        <input type="url" id="edit-website" placeholder="https://your-website.com">
                     </div>
                     
-                    <div class="form-group">
-                        <label>Location</label>
-                        <input type="text" id="signup-location" placeholder="City, Country">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Website</label>
-                        <input type="url" id="signup-website" placeholder="https://your-website.com">
-                    </div>
-                    
-                    <div class="form-group" style="margin-top: 24px;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
-                            <input type="checkbox" id="signup-terms" required>
-                            I agree to the Terms of Service and Privacy Policy
-                        </label>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary" onclick="closeEditProfileModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Save Changes</button>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" onclick="closeSignupModal()">Cancel</button>
-                <button class="btn-primary" onclick="handleSignup(event)">
-                    <i class="fas fa-user-plus"></i> Create Account
-                </button>
             </div>
         </div>
     </div>
@@ -443,6 +429,7 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="toast-container"></div>
 
-    <script src="script.js"></script>
+    <!-- Scripts -->
+    <script src="app.js"></script>
 </body>
 </html>
