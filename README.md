@@ -12,7 +12,7 @@ A modern social media webapp that integrates with the Social Wallet API, allowin
 
 ## Live Demo
 
-- **WebApp**: [Coming Soon]
+- **WebApp**: https://coruscating-pixie-0c117e.netlify.app
 - **API**: https://squid-app-mky7a.ondigitalocean.app
 
 ## Screenshots
