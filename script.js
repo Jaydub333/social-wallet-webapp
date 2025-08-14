@@ -504,24 +504,45 @@ function showToast(message, type = 'info') {
 }
 
 // Social Media Functions
-function loadSocialFeed() {
+async function loadSocialFeed() {
     const postsContainer = document.getElementById('posts-feed');
     
-    if (socialPosts.length === 0) {
+    try {
+        showLoading('Loading posts...');
+        
+        const response = await fetch(`${API_BASE}/api/posts`);
+        const data = await response.json();
+        
+        if (data.success && data.posts.length > 0) {
+            socialPosts = data.posts;
+            postsContainer.innerHTML = socialPosts.map(post => createPostHTML(post)).join('');
+        } else {
+            postsContainer.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; color: #666;">
+                    <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; color: #ddd;"></i>
+                    <h3 style="margin-bottom: 8px;">Welcome to Social Wallet!</h3>
+                    <p>Start following people and creating posts to see content here.</p>
+                    <button class="btn-primary" onclick="openCreatePostModal()" style="margin-top: 20px;">
+                        <i class="fas fa-plus"></i> Create Your First Post
+                    </button>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading posts:', error);
         postsContainer.innerHTML = `
             <div style="text-align: center; padding: 60px 20px; color: #666;">
-                <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; color: #ddd;"></i>
-                <h3 style="margin-bottom: 8px;">Welcome to Social Wallet!</h3>
-                <p>Start following people and creating posts to see content here.</p>
-                <button class="btn-primary" onclick="openCreatePostModal()" style="margin-top: 20px;">
-                    <i class="fas fa-plus"></i> Create Your First Post
+                <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px; color: #dc3545;"></i>
+                <h3 style="margin-bottom: 8px;">Error Loading Posts</h3>
+                <p>Unable to connect to Social Wallet API</p>
+                <button class="btn-primary" onclick="loadSocialFeed()" style="margin-top: 20px;">
+                    <i class="fas fa-refresh"></i> Try Again
                 </button>
             </div>
         `;
-        return;
+    } finally {
+        hideLoading();
     }
-    
-    postsContainer.innerHTML = socialPosts.map(post => createPostHTML(post)).join('');
 }
 
 function createPostHTML(post) {
@@ -532,7 +553,7 @@ function createPostHTML(post) {
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <div class="post-user-info">
-                    <div class="post-user-name">${post.author.name}</div>
+                    <div class="post-user-name">${post.author.displayName || post.author.name}</div>
                     <div class="post-user-handle">@${post.author.username}</div>
                 </div>
                 <div class="post-time">${formatPostTime(post.createdAt)}</div>
@@ -545,7 +566,7 @@ function createPostHTML(post) {
             
             <div class="post-content">
                 ${post.content}
-                ${post.hashtags ? post.hashtags.map(tag => `<span style="color: #667eea;">#${tag}</span>`).join(' ') : ''}
+                ${post.hashtags && post.hashtags.length > 0 ? ' ' + post.hashtags.map(tag => `<span style="color: #667eea;">#${tag}</span>`).join(' ') : ''}
             </div>
             
             ${post.media ? `<img src="${post.media}" class="post-media" alt="Post media">` : ''}
@@ -553,15 +574,15 @@ function createPostHTML(post) {
             <div class="post-actions">
                 <button class="post-action ${post.isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
                     <i class="fas fa-heart"></i>
-                    <span>${post.likes}</span>
+                    <span>${post.likesCount || post.likes || 0}</span>
                 </button>
                 <button class="post-action" onclick="toggleComments('${post.id}')">
                     <i class="fas fa-comment"></i>
-                    <span>${post.comments.length}</span>
+                    <span>${post.commentsCount || post.comments?.length || 0}</span>
                 </button>
                 <button class="post-action" onclick="sharePost('${post.id}')">
                     <i class="fas fa-share"></i>
-                    <span>${post.shares}</span>
+                    <span>${post.shares || 0}</span>
                 </button>
                 <button class="post-action" onclick="openGiftModal('${post.author.id}')">
                     <i class="fas fa-gift"></i>
@@ -579,14 +600,14 @@ function createPostHTML(post) {
                     <button class="comment-submit" onclick="submitComment('${post.id}')">Post</button>
                 </div>
                 <div class="comments-list">
-                    ${post.comments.map(comment => `
+                    ${(post.comments || []).map(comment => `
                         <div class="comment">
                             <div class="comment-avatar">
                                 <i class="fas fa-user-circle"></i>
                             </div>
                             <div class="comment-content">
-                                <div class="comment-author">${comment.author}</div>
-                                <div class="comment-text">${comment.text}</div>
+                                <div class="comment-author">${comment.author?.displayName || comment.author || 'Anonymous'}</div>
+                                <div class="comment-text">${comment.content || comment.text}</div>
                             </div>
                         </div>
                     `).join('')}
@@ -687,61 +708,74 @@ async function createPost() {
     showLoading('Creating post...');
     
     try {
-        // Simulate post creation
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        // Extract hashtags
-        const hashtags = content.match(/#[\w]+/g)?.map(tag => tag.substring(1)) || [];
-        
-        // Create new post
-        const newPost = {
-            id: 'post_' + Math.random().toString(36).substr(2, 9),
-            author: {
-                name: currentUser.displayName,
-                username: currentUser.username,
-                id: currentUser.id
-            },
+        // Create post data
+        const postData = {
             content: content,
-            hashtags: hashtags,
-            media: mediaFiles.length > 0 ? URL.createObjectURL(mediaFiles[0]) : null,
-            likes: 0,
-            shares: 0,
-            comments: [],
-            isLiked: false,
-            createdAt: new Date().toISOString()
+            userId: currentUser?.id || 'user_001',
+            media: mediaFiles.length > 0 ? URL.createObjectURL(mediaFiles[0]) : null
         };
         
-        // Add to beginning of posts array
-        socialPosts.unshift(newPost);
+        // Send to API
+        const response = await fetch(`${API_BASE}/api/posts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(postData)
+        });
         
-        // Close modal and reload feed
-        closeCreatePostModal();
-        switchScreen('feed');
+        const data = await response.json();
         
-        showToast('Post created successfully!', 'success');
+        if (data.success) {
+            // Close modal and reload feed
+            closeCreatePostModal();
+            switchScreen('feed');
+            showToast('Post created successfully!', 'success');
+        } else {
+            throw new Error(data.error || 'Failed to create post');
+        }
         
     } catch (error) {
         console.error('Post creation error:', error);
-        showToast('Failed to create post', 'error');
+        showToast('Failed to create post: ' + error.message, 'error');
     } finally {
         hideLoading();
     }
 }
 
 // Post Interaction Functions
-function toggleLike(postId) {
-    const post = socialPosts.find(p => p.id === postId);
-    if (post) {
-        post.isLiked = !post.isLiked;
-        post.likes += post.isLiked ? 1 : -1;
+async function toggleLike(postId) {
+    try {
+        const response = await fetch(`${API_BASE}/api/posts/${postId}/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                userId: currentUser?.id || 'user_001'
+            })
+        });
         
-        // Update UI
-        const postElement = document.getElementById(`post-${postId}`);
-        const likeButton = postElement.querySelector('.post-action');
-        likeButton.classList.toggle('liked', post.isLiked);
-        likeButton.querySelector('span').textContent = post.likes;
+        const data = await response.json();
         
-        showToast(post.isLiked ? 'Liked!' : 'Unliked', 'success');
+        if (data.success) {
+            // Update UI immediately for better UX
+            const postElement = document.getElementById(`post-${postId}`);
+            const likeButton = postElement.querySelector('.post-action');
+            const isLiked = data.liked;
+            
+            likeButton.classList.toggle('liked', isLiked);
+            
+            // Reload feed to get updated like counts
+            await loadSocialFeed();
+            
+            showToast(isLiked ? 'Liked!' : 'Unliked', 'success');
+        } else {
+            throw new Error(data.error || 'Failed to toggle like');
+        }
+    } catch (error) {
+        console.error('Like toggle error:', error);
+        showToast('Failed to update like: ' + error.message, 'error');
     }
 }
 
@@ -757,8 +791,7 @@ function handleCommentSubmit(event, postId) {
     }
 }
 
-function submitComment(postId) {
-    const post = socialPosts.find(p => p.id === postId);
+async function submitComment(postId) {
     const commentInput = document.querySelector(`#comments-${postId} .comment-input`);
     const commentText = commentInput.value.trim();
     
@@ -767,25 +800,34 @@ function submitComment(postId) {
         return;
     }
     
-    // Add comment
-    const newComment = {
-        id: 'comment_' + Math.random().toString(36).substr(2, 9),
-        author: currentUser.displayName,
-        text: commentText,
-        createdAt: new Date().toISOString()
-    };
-    
-    post.comments.push(newComment);
-    commentInput.value = '';
-    
-    // Reload the post
-    const postElement = document.getElementById(`post-${postId}`);
-    postElement.outerHTML = createPostHTML(post);
-    
-    // Reopen comments
-    toggleComments(postId);
-    
-    showToast('Comment added!', 'success');
+    try {
+        const response = await fetch(`${API_BASE}/api/posts/${postId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                content: commentText,
+                userId: currentUser?.id || 'user_001'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            commentInput.value = '';
+            // Reload the feed to show new comment
+            await loadSocialFeed();
+            // Reopen comments section
+            toggleComments(postId);
+            showToast('Comment added!', 'success');
+        } else {
+            throw new Error(data.error || 'Failed to add comment');
+        }
+    } catch (error) {
+        console.error('Comment submission error:', error);
+        showToast('Failed to add comment: ' + error.message, 'error');
+    }
 }
 
 function sharePost(postId) {
