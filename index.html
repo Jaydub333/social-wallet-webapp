@@ -25,6 +25,12 @@
                 <a href="#" class="nav-link" data-page="media">
                     <i class="fas fa-images"></i> Media
                 </a>
+                <a href="#" class="nav-link" data-page="feed">
+                    <i class="fas fa-home"></i> Feed
+                </a>
+                <a href="#" class="nav-link" data-page="explore">
+                    <i class="fas fa-compass"></i> Explore
+                </a>
                 <a href="#" class="nav-link" data-page="gifts">
                     <i class="fas fa-gift"></i> Gifts
                 </a>
@@ -183,6 +189,74 @@
                 </div>
             </div>
 
+            <!-- Social Feed Screen -->
+            <div id="feed-screen" class="screen">
+                <div class="feed-container">
+                    <!-- Create Post Section -->
+                    <div class="create-post-card">
+                        <div class="create-post-header">
+                            <div class="user-avatar-small">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <input type="text" class="post-input" placeholder="What's on your mind?" onclick="openCreatePostModal()">
+                        </div>
+                        <div class="create-post-actions">
+                            <button class="post-action-btn" onclick="openCreatePostModal('photo')">
+                                <i class="fas fa-image"></i> Photo
+                            </button>
+                            <button class="post-action-btn" onclick="openCreatePostModal('video')">
+                                <i class="fas fa-video"></i> Video
+                            </button>
+                            <button class="post-action-btn" onclick="openCreatePostModal('poll')">
+                                <i class="fas fa-poll"></i> Poll
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Posts Feed -->
+                    <div class="posts-feed" id="posts-feed">
+                        <!-- Posts will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Explore Screen -->
+            <div id="explore-screen" class="screen">
+                <div class="explore-container">
+                    <div class="explore-header">
+                        <h2><i class="fas fa-compass"></i> Explore</h2>
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search users, hashtags..." id="search-input">
+                        </div>
+                    </div>
+
+                    <!-- Trending Section -->
+                    <div class="trending-section">
+                        <h3>Trending</h3>
+                        <div class="trending-list" id="trending-list">
+                            <!-- Trending topics will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Suggested Users -->
+                    <div class="suggested-users">
+                        <h3>Suggested for You</h3>
+                        <div class="users-grid" id="suggested-users">
+                            <!-- Suggested users will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Popular Posts -->
+                    <div class="popular-posts">
+                        <h3>Popular Posts</h3>
+                        <div class="posts-grid" id="popular-posts">
+                            <!-- Popular posts will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Gifts Screen -->
             <div id="gifts-screen" class="screen">
                 <div class="gifts-section">
@@ -211,6 +285,58 @@
             </div>
         </div>
     </main>
+
+    <!-- Create Post Modal -->
+    <div id="create-post-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus"></i> Create Post</h3>
+                <button class="close-btn" onclick="closeCreatePostModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="post-creator-header">
+                    <div class="user-avatar-small">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-info-small">
+                        <span class="post-username">Demo User</span>
+                        <div class="privacy-selector">
+                            <i class="fas fa-globe"></i>
+                            <span>Public</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <textarea id="post-content" placeholder="What's happening?"></textarea>
+                
+                <div class="post-media-preview" id="post-media-preview" style="display: none;">
+                    <!-- Media preview will show here -->
+                </div>
+                
+                <div class="post-options">
+                    <button class="post-option-btn" onclick="addPostMedia()">
+                        <i class="fas fa-image"></i> Add Photo/Video
+                    </button>
+                    <button class="post-option-btn" onclick="addPostPoll()">
+                        <i class="fas fa-poll"></i> Create Poll
+                    </button>
+                    <button class="post-option-btn" onclick="addPostLocation()">
+                        <i class="fas fa-map-marker-alt"></i> Add Location
+                    </button>
+                </div>
+                
+                <input type="file" id="post-media-input" multiple accept="image/*,video/*" style="display: none;">
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeCreatePostModal()">Cancel</button>
+                <button class="btn-primary" onclick="createPost()">
+                    <i class="fas fa-paper-plane"></i> Post
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Upload Modal -->
     <div id="upload-modal" class="modal">

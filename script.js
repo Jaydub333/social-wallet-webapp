@@ -6,6 +6,9 @@ let currentUser = null;
 let currentScreen = 'dashboard';
 let mediaItems = [];
 let giftCatalog = [];
+let socialPosts = [];
+let trendingTopics = [];
+let suggestedUsers = [];
 
 // Initialize App
 document.addEventListener('DOMContentLoaded', function() {
@@ -134,8 +137,8 @@ function showAuthenticatedView() {
     // Load user data into forms
     loadUserProfile();
     
-    // Switch to dashboard
-    switchScreen('dashboard');
+    // Switch to feed (main social media screen)
+    switchScreen('feed');
 }
 
 // Screen Navigation
@@ -164,6 +167,12 @@ function switchScreen(screenName) {
             break;
         case 'media':
             loadMediaLibrary();
+            break;
+        case 'feed':
+            loadSocialFeed();
+            break;
+        case 'explore':
+            loadExplorePage();
             break;
         case 'gifts':
             loadGiftCenter();
@@ -494,6 +503,340 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
+// Social Media Functions
+function loadSocialFeed() {
+    const postsContainer = document.getElementById('posts-feed');
+    
+    if (socialPosts.length === 0) {
+        postsContainer.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px; color: #666;">
+                <i class="fas fa-users" style="font-size: 48px; margin-bottom: 16px; color: #ddd;"></i>
+                <h3 style="margin-bottom: 8px;">Welcome to Social Wallet!</h3>
+                <p>Start following people and creating posts to see content here.</p>
+                <button class="btn-primary" onclick="openCreatePostModal()" style="margin-top: 20px;">
+                    <i class="fas fa-plus"></i> Create Your First Post
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    postsContainer.innerHTML = socialPosts.map(post => createPostHTML(post)).join('');
+}
+
+function createPostHTML(post) {
+    return `
+        <div class="post-card" id="post-${post.id}">
+            <div class="post-header">
+                <div class="user-avatar-small">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="post-user-info">
+                    <div class="post-user-name">${post.author.name}</div>
+                    <div class="post-user-handle">@${post.author.username}</div>
+                </div>
+                <div class="post-time">${formatPostTime(post.createdAt)}</div>
+                <div class="post-options">
+                    <button class="post-options-btn" onclick="showPostOptions('${post.id}')">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="post-content">
+                ${post.content}
+                ${post.hashtags ? post.hashtags.map(tag => `<span style="color: #667eea;">#${tag}</span>`).join(' ') : ''}
+            </div>
+            
+            ${post.media ? `<img src="${post.media}" class="post-media" alt="Post media">` : ''}
+            
+            <div class="post-actions">
+                <button class="post-action ${post.isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
+                    <i class="fas fa-heart"></i>
+                    <span>${post.likes}</span>
+                </button>
+                <button class="post-action" onclick="toggleComments('${post.id}')">
+                    <i class="fas fa-comment"></i>
+                    <span>${post.comments.length}</span>
+                </button>
+                <button class="post-action" onclick="sharePost('${post.id}')">
+                    <i class="fas fa-share"></i>
+                    <span>${post.shares}</span>
+                </button>
+                <button class="post-action" onclick="openGiftModal('${post.author.id}')">
+                    <i class="fas fa-gift"></i>
+                    <span>Gift</span>
+                </button>
+            </div>
+            
+            <div class="post-comments" id="comments-${post.id}" style="display: none;">
+                <div class="comment-input-container">
+                    <div class="comment-avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <input type="text" class="comment-input" placeholder="Write a comment..." 
+                           onkeypress="handleCommentSubmit(event, '${post.id}')">
+                    <button class="comment-submit" onclick="submitComment('${post.id}')">Post</button>
+                </div>
+                <div class="comments-list">
+                    ${post.comments.map(comment => `
+                        <div class="comment">
+                            <div class="comment-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-author">${comment.author}</div>
+                                <div class="comment-text">${comment.text}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function loadExplorePage() {
+    // Load trending topics
+    const trendingList = document.getElementById('trending-list');
+    trendingList.innerHTML = trendingTopics.map(topic => `
+        <div class="trending-item" onclick="searchTopic('${topic.tag}')">
+            <div class="trending-topic">#${topic.tag}</div>
+            <div class="trending-posts">${topic.posts} posts</div>
+        </div>
+    `).join('');
+    
+    // Load suggested users
+    const suggestedUsersEl = document.getElementById('suggested-users');
+    suggestedUsersEl.innerHTML = suggestedUsers.map(user => `
+        <div class="user-card">
+            <div class="user-card-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="user-card-name">${user.name}</div>
+            <div class="user-card-handle">@${user.username}</div>
+            <button class="follow-btn ${user.following ? 'following' : ''}" 
+                    onclick="toggleFollow('${user.id}')">
+                ${user.following ? 'Following' : 'Follow'}
+            </button>
+        </div>
+    `).join('');
+    
+    // Load popular posts (simplified version of regular posts)
+    const popularPosts = document.getElementById('popular-posts');
+    const topPosts = socialPosts.slice(0, 6);
+    popularPosts.innerHTML = topPosts.map(post => `
+        <div class="post-card" style="cursor: pointer;" onclick="viewPost('${post.id}')">
+            ${post.media ? `<img src="${post.media}" class="post-media" alt="Post media">` : ''}
+            <div style="padding: 12px;">
+                <div style="font-size: 14px; margin-bottom: 8px;">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>
+                <div style="display: flex; justify-content: space-between; color: #666; font-size: 12px;">
+                    <span><i class="fas fa-heart"></i> ${post.likes}</span>
+                    <span><i class="fas fa-comment"></i> ${post.comments.length}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Create Post Functions
+function openCreatePostModal(type = 'text') {
+    const modal = document.getElementById('create-post-modal');
+    modal.classList.add('active');
+    
+    // Update user info
+    if (currentUser) {
+        document.querySelector('.post-username').textContent = currentUser.displayName;
+    }
+    
+    // Focus on content area
+    document.getElementById('post-content').focus();
+}
+
+function closeCreatePostModal() {
+    const modal = document.getElementById('create-post-modal');
+    modal.classList.remove('active');
+    
+    // Reset form
+    document.getElementById('post-content').value = '';
+    document.getElementById('post-media-preview').style.display = 'none';
+    document.getElementById('post-media-input').value = '';
+}
+
+function addPostMedia() {
+    document.getElementById('post-media-input').click();
+}
+
+function addPostPoll() {
+    showToast('Poll feature coming soon!', 'info');
+}
+
+function addPostLocation() {
+    showToast('Location feature coming soon!', 'info');
+}
+
+async function createPost() {
+    const content = document.getElementById('post-content').value.trim();
+    const mediaFiles = document.getElementById('post-media-input').files;
+    
+    if (!content && mediaFiles.length === 0) {
+        showToast('Please add some content or media', 'error');
+        return;
+    }
+    
+    showLoading('Creating post...');
+    
+    try {
+        // Simulate post creation
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Extract hashtags
+        const hashtags = content.match(/#[\w]+/g)?.map(tag => tag.substring(1)) || [];
+        
+        // Create new post
+        const newPost = {
+            id: 'post_' + Math.random().toString(36).substr(2, 9),
+            author: {
+                name: currentUser.displayName,
+                username: currentUser.username,
+                id: currentUser.id
+            },
+            content: content,
+            hashtags: hashtags,
+            media: mediaFiles.length > 0 ? URL.createObjectURL(mediaFiles[0]) : null,
+            likes: 0,
+            shares: 0,
+            comments: [],
+            isLiked: false,
+            createdAt: new Date().toISOString()
+        };
+        
+        // Add to beginning of posts array
+        socialPosts.unshift(newPost);
+        
+        // Close modal and reload feed
+        closeCreatePostModal();
+        switchScreen('feed');
+        
+        showToast('Post created successfully!', 'success');
+        
+    } catch (error) {
+        console.error('Post creation error:', error);
+        showToast('Failed to create post', 'error');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Post Interaction Functions
+function toggleLike(postId) {
+    const post = socialPosts.find(p => p.id === postId);
+    if (post) {
+        post.isLiked = !post.isLiked;
+        post.likes += post.isLiked ? 1 : -1;
+        
+        // Update UI
+        const postElement = document.getElementById(`post-${postId}`);
+        const likeButton = postElement.querySelector('.post-action');
+        likeButton.classList.toggle('liked', post.isLiked);
+        likeButton.querySelector('span').textContent = post.likes;
+        
+        showToast(post.isLiked ? 'Liked!' : 'Unliked', 'success');
+    }
+}
+
+function toggleComments(postId) {
+    const commentsSection = document.getElementById(`comments-${postId}`);
+    const isVisible = commentsSection.style.display !== 'none';
+    commentsSection.style.display = isVisible ? 'none' : 'block';
+}
+
+function handleCommentSubmit(event, postId) {
+    if (event.key === 'Enter') {
+        submitComment(postId);
+    }
+}
+
+function submitComment(postId) {
+    const post = socialPosts.find(p => p.id === postId);
+    const commentInput = document.querySelector(`#comments-${postId} .comment-input`);
+    const commentText = commentInput.value.trim();
+    
+    if (!commentText) {
+        showToast('Please enter a comment', 'error');
+        return;
+    }
+    
+    // Add comment
+    const newComment = {
+        id: 'comment_' + Math.random().toString(36).substr(2, 9),
+        author: currentUser.displayName,
+        text: commentText,
+        createdAt: new Date().toISOString()
+    };
+    
+    post.comments.push(newComment);
+    commentInput.value = '';
+    
+    // Reload the post
+    const postElement = document.getElementById(`post-${postId}`);
+    postElement.outerHTML = createPostHTML(post);
+    
+    // Reopen comments
+    toggleComments(postId);
+    
+    showToast('Comment added!', 'success');
+}
+
+function sharePost(postId) {
+    const post = socialPosts.find(p => p.id === postId);
+    if (post) {
+        post.shares += 1;
+        
+        // Update UI
+        const postElement = document.getElementById(`post-${postId}`);
+        const shareButton = postElement.querySelectorAll('.post-action')[2];
+        shareButton.querySelector('span').textContent = post.shares;
+        shareButton.classList.add('shared');
+        
+        showToast('Post shared!', 'success');
+    }
+}
+
+function toggleFollow(userId) {
+    const user = suggestedUsers.find(u => u.id === userId);
+    if (user) {
+        user.following = !user.following;
+        loadExplorePage();
+        showToast(user.following ? `Now following ${user.name}!` : `Unfollowed ${user.name}`, 'success');
+    }
+}
+
+function searchTopic(tag) {
+    showToast(`Searching for #${tag}...`, 'info');
+    // Here you would implement search functionality
+}
+
+function viewPost(postId) {
+    showToast('Opening post...', 'info');
+    // Here you would implement detailed post view
+}
+
+function formatPostTime(timestamp) {
+    const now = new Date();
+    const postTime = new Date(timestamp);
+    const diffMs = now - postTime;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffHours < 24) return `${diffHours}h`;
+    if (diffDays < 7) return `${diffDays}d`;
+    return postTime.toLocaleDateString();
+}
+
 // Sample Data
 function loadSampleData() {
     // Gift catalog
@@ -522,6 +865,70 @@ function loadSampleData() {
             tags: ['city', 'night'],
             uploadDate: new Date(Date.now() - 172800000).toISOString()
         }
+    ];
+    
+    // Sample social posts
+    socialPosts = [
+        {
+            id: 'post_001',
+            author: { name: 'Sarah Johnson', username: 'sarah_j', id: 'user_001' },
+            content: 'Just integrated Social Wallet into my app! 🚀 The user onboarding is now lightning fast! #SocialWallet #TechLife',
+            hashtags: ['SocialWallet', 'TechLife'],
+            media: 'https://via.placeholder.com/500x300?text=App+Screenshot',
+            likes: 24,
+            shares: 5,
+            comments: [
+                { author: 'Mike Chen', text: 'That\'s awesome! How was the integration process?', createdAt: new Date(Date.now() - 3600000).toISOString() }
+            ],
+            isLiked: false,
+            createdAt: new Date(Date.now() - 7200000).toISOString()
+        },
+        {
+            id: 'post_002',
+            author: { name: 'Alex Rodriguez', username: 'alex_dev', id: 'user_002' },
+            content: 'Building the future of social media with cross-platform profiles! Who else is tired of filling out the same forms over and over? 🤔 #Innovation #UX',
+            hashtags: ['Innovation', 'UX'],
+            media: null,
+            likes: 18,
+            shares: 3,
+            comments: [
+                { author: 'Emma Wilson', text: 'So true! This is exactly what we need!', createdAt: new Date(Date.now() - 5400000).toISOString() },
+                { author: 'David Kim', text: 'Love this concept 💯', createdAt: new Date(Date.now() - 4800000).toISOString() }
+            ],
+            isLiked: true,
+            createdAt: new Date(Date.now() - 14400000).toISOString()
+        },
+        {
+            id: 'post_003',
+            author: { name: 'TechCrunch', username: 'techcrunch', id: 'user_003' },
+            content: 'BREAKING: Social Wallet API launches with $1M+ revenue potential. Universal profiles and cross-platform gifts are changing the game! 💎',
+            hashtags: [],
+            media: 'https://via.placeholder.com/500x250?text=News+Article',
+            likes: 156,
+            shares: 42,
+            comments: [
+                { author: 'Startup Founder', text: 'This is exactly what our platform needs!', createdAt: new Date(Date.now() - 10800000).toISOString() }
+            ],
+            isLiked: false,
+            createdAt: new Date(Date.now() - 21600000).toISOString()
+        }
+    ];
+    
+    // Trending topics
+    trendingTopics = [
+        { tag: 'SocialWallet', posts: 1250 },
+        { tag: 'TechLife', posts: 890 },
+        { tag: 'Innovation', posts: 2340 },
+        { tag: 'UX', posts: 1680 },
+        { tag: 'API', posts: 3200 }
+    ];
+    
+    // Suggested users
+    suggestedUsers = [
+        { id: 'user_004', name: 'Jessica Chen', username: 'jess_designer', following: false },
+        { id: 'user_005', name: 'Marcus Thompson', username: 'marcus_code', following: false },
+        { id: 'user_006', name: 'Linda Garcia', username: 'linda_pm', following: true },
+        { id: 'user_007', name: 'Robert Kim', username: 'rob_startup', following: false }
     ];
 }
 
