@@ -1,6 +1,14 @@
 // Social Wallet API Configuration
 const API_BASE = 'https://squid-app-mky7a.ondigitalocean.app';
 
+// Security: HTML Sanitization
+function sanitizeHTML(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // Global State
 let currentUser = null;
 let currentScreen = 'dashboard';
@@ -345,14 +353,14 @@ function loadDashboardData() {
     const activityList = document.getElementById('activity-list');
     activityList.innerHTML = activities.map(activity => `
         <div class="activity-item">
-            <div class="activity-icon ${activity.type}">
-                <i class="${activity.icon}"></i>
+            <div class="activity-icon ${sanitizeHTML(activity.type)}">
+                <i class="${sanitizeHTML(activity.icon)}"></i>
             </div>
             <div class="activity-content">
-                <h4>${activity.title}</h4>
-                <p>${activity.description}</p>
+                <h4>${sanitizeHTML(activity.title)}</h4>
+                <p>${sanitizeHTML(activity.description)}</p>
             </div>
-            <div class="activity-time">${activity.time}</div>
+            <div class="activity-time">${sanitizeHTML(activity.time)}</div>
         </div>
     `).join('');
 }
@@ -426,10 +434,10 @@ function loadMediaLibrary() {
     }
     
     mediaGrid.innerHTML = mediaItems.map(item => `
-        <div class="media-item" onclick="viewMediaItem('${item.id}')">
-            <img src="${item.url}" alt="${item.caption}" loading="lazy">
+        <div class="media-item" onclick="viewMediaItem('${sanitizeHTML(item.id)}')">
+            <img src="${sanitizeHTML(item.url)}" alt="${sanitizeHTML(item.caption)}" loading="lazy">
             <div class="media-overlay">
-                <div>${item.caption}</div>
+                <div>${sanitizeHTML(item.caption)}</div>
             </div>
         </div>
     `).join('');
@@ -563,10 +571,10 @@ function loadGiftCenter() {
     // Load gift catalog
     const giftCatalogEl = document.getElementById('gift-catalog');
     giftCatalogEl.innerHTML = giftCatalog.map(gift => `
-        <div class="gift-item" onclick="sendGift('${gift.id}')">
-            <i class="${gift.icon}"></i>
-            <h4>${gift.name}</h4>
-            <div class="price">${gift.price} coins</div>
+        <div class="gift-item" onclick="sendGift('${sanitizeHTML(gift.id)}')">
+            <i class="${sanitizeHTML(gift.icon)}"></i>
+            <h4>${sanitizeHTML(gift.name)}</h4>
+            <div class="price">${sanitizeHTML(gift.price)} coins</div>
         </div>
     `).join('');
     
@@ -595,12 +603,12 @@ function loadGiftCenter() {
         <div class="gift-history-item">
             <i class="fas fa-gift" style="color: #667eea;"></i>
             <div style="flex: 1;">
-                <h4>${item.type === 'received' ? 'Received' : 'Sent'} ${item.gift}</h4>
-                <p>${item.type === 'received' ? 'From' : 'To'} ${item.type === 'received' ? item.from : item.to} on ${item.platform}</p>
+                <h4>${item.type === 'received' ? 'Received' : 'Sent'} ${sanitizeHTML(item.gift)}</h4>
+                <p>${item.type === 'received' ? 'From' : 'To'} ${sanitizeHTML(item.type === 'received' ? item.from : item.to)} on ${sanitizeHTML(item.platform)}</p>
             </div>
             <div style="text-align: right;">
-                <div>${item.value}</div>
-                <div style="font-size: 12px; color: #666;">${item.time}</div>
+                <div>${sanitizeHTML(item.value)}</div>
+                <div style="font-size: 12px; color: #666;">${sanitizeHTML(item.time)}</div>
             </div>
         </div>
     `).join('');
@@ -688,29 +696,29 @@ async function loadSocialFeed() {
 
 function createPostHTML(post) {
     return `
-        <div class="post-card" id="post-${post.id}">
+        <div class="post-card" id="post-${sanitizeHTML(post.id)}">
             <div class="post-header">
                 <div class="user-avatar-small">
                     <i class="fas fa-user-circle"></i>
                 </div>
                 <div class="post-user-info">
-                    <div class="post-user-name">${post.author.displayName || post.author.name}</div>
-                    <div class="post-user-handle">@${post.author.username}</div>
+                    <div class="post-user-name">${sanitizeHTML(post.author.displayName || post.author.name)}</div>
+                    <div class="post-user-handle">@${sanitizeHTML(post.author.username)}</div>
                 </div>
-                <div class="post-time">${formatPostTime(post.createdAt)}</div>
+                <div class="post-time">${sanitizeHTML(formatPostTime(post.createdAt))}</div>
                 <div class="post-options">
-                    <button class="post-options-btn" onclick="showPostOptions('${post.id}')">
+                    <button class="post-options-btn" onclick="showPostOptions('${sanitizeHTML(post.id)}')">
                         <i class="fas fa-ellipsis-h"></i>
                     </button>
                 </div>
             </div>
-            
+
             <div class="post-content">
-                ${post.content}
-                ${post.hashtags && post.hashtags.length > 0 ? ' ' + post.hashtags.map(tag => `<span style="color: #667eea;">#${tag}</span>`).join(' ') : ''}
+                ${sanitizeHTML(post.content)}
+                ${post.hashtags && post.hashtags.length > 0 ? ' ' + post.hashtags.map(tag => `<span style="color: #667eea;">#${sanitizeHTML(tag)}</span>`).join(' ') : ''}
             </div>
-            
-            ${post.media ? `<img src="${post.media}" class="post-media" alt="Post media">` : ''}
+
+            ${post.media ? `<img src="${sanitizeHTML(post.media)}" class="post-media" alt="Post media">` : ''}
             
             <div class="post-actions">
                 <button class="post-action ${post.isLiked ? 'liked' : ''}" onclick="toggleLike('${post.id}')">
@@ -762,12 +770,12 @@ function loadExplorePage() {
     // Load trending topics
     const trendingList = document.getElementById('trending-list');
     trendingList.innerHTML = trendingTopics.map(topic => `
-        <div class="trending-item" onclick="searchTopic('${topic.tag}')">
-            <div class="trending-topic">#${topic.tag}</div>
-            <div class="trending-posts">${topic.posts} posts</div>
+        <div class="trending-item" onclick="searchTopic('${sanitizeHTML(topic.tag)}')">
+            <div class="trending-topic">#${sanitizeHTML(topic.tag)}</div>
+            <div class="trending-posts">${sanitizeHTML(topic.posts)} posts</div>
         </div>
     `).join('');
-    
+
     // Load suggested users
     const suggestedUsersEl = document.getElementById('suggested-users');
     suggestedUsersEl.innerHTML = suggestedUsers.map(user => `
@@ -775,26 +783,26 @@ function loadExplorePage() {
             <div class="user-card-avatar">
                 <i class="fas fa-user-circle"></i>
             </div>
-            <div class="user-card-name">${user.name}</div>
-            <div class="user-card-handle">@${user.username}</div>
-            <button class="follow-btn ${user.following ? 'following' : ''}" 
-                    onclick="toggleFollow('${user.id}')">
+            <div class="user-card-name">${sanitizeHTML(user.name)}</div>
+            <div class="user-card-handle">@${sanitizeHTML(user.username)}</div>
+            <button class="follow-btn ${user.following ? 'following' : ''}"
+                    onclick="toggleFollow('${sanitizeHTML(user.id)}')">
                 ${user.following ? 'Following' : 'Follow'}
             </button>
         </div>
     `).join('');
-    
+
     // Load popular posts (simplified version of regular posts)
     const popularPosts = document.getElementById('popular-posts');
     const topPosts = socialPosts.slice(0, 6);
     popularPosts.innerHTML = topPosts.map(post => `
-        <div class="post-card" style="cursor: pointer;" onclick="viewPost('${post.id}')">
-            ${post.media ? `<img src="${post.media}" class="post-media" alt="Post media">` : ''}
+        <div class="post-card" style="cursor: pointer;" onclick="viewPost('${sanitizeHTML(post.id)}')">
+            ${post.media ? `<img src="${sanitizeHTML(post.media)}" class="post-media" alt="Post media">` : ''}
             <div style="padding: 12px;">
-                <div style="font-size: 14px; margin-bottom: 8px;">${post.content.substring(0, 100)}${post.content.length > 100 ? '...' : ''}</div>
+                <div style="font-size: 14px; margin-bottom: 8px;">${sanitizeHTML(post.content.substring(0, 100))}${post.content.length > 100 ? '...' : ''}</div>
                 <div style="display: flex; justify-content: space-between; color: #666; font-size: 12px;">
-                    <span><i class="fas fa-heart"></i> ${post.likes}</span>
-                    <span><i class="fas fa-comment"></i> ${post.comments.length}</span>
+                    <span><i class="fas fa-heart"></i> ${sanitizeHTML(post.likes)}</span>
+                    <span><i class="fas fa-comment"></i> ${sanitizeHTML(post.comments.length)}</span>
                 </div>
             </div>
         </div>

@@ -7,6 +7,14 @@
 // API Configuration
 const API_BASE_URL = 'https://squid-app-mky7a.ondigitalocean.app';
 
+// Security: HTML Sanitization
+function sanitizeHTML(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
 // Application State
 class AppState {
   constructor() {
@@ -467,31 +475,31 @@ function renderPosts(posts) {
 function createPostHTML(post) {
   const timeAgo = formatTimeAgo(post.createdAt);
   const isLiked = post.isLiked || false;
-  const authorName = post.author.displayName || post.author.name;
-  
+  const authorName = sanitizeHTML(post.author.displayName || post.author.name);
+
   // Use author's profile image if available, otherwise generate avatar
-  const authorAvatar = post.author.profileImage || 
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(authorName)}&background=667eea&color=fff`;
-  
+  const authorAvatar = post.author.profileImage ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.displayName || post.author.name)}&background=667eea&color=fff`;
+
   return `
-    <div class="post-card" data-post-id="${post.id}">
+    <div class="post-card" data-post-id="${sanitizeHTML(post.id)}">
       <div class="post-header">
         <div class="user-avatar">
-          <img src="${authorAvatar}" alt="${authorName}">
+          <img src="${sanitizeHTML(authorAvatar)}" alt="${authorName}">
         </div>
         <div class="post-user-info">
-          <div class="post-user-name">${post.author.displayName || post.author.name}</div>
-          <div class="post-user-handle">@${post.author.username}</div>
+          <div class="post-user-name">${authorName}</div>
+          <div class="post-user-handle">@${sanitizeHTML(post.author.username)}</div>
         </div>
-        <div class="post-time">${timeAgo}</div>
+        <div class="post-time">${sanitizeHTML(timeAgo)}</div>
       </div>
-      
-      <div class="post-content">${post.content}</div>
-      
-      ${post.media ? `<img src="${post.media}" class="post-media" alt="Post media">` : ''}
-      
-      ${post.hashtags && post.hashtags.length > 0 ? 
-        `<div class="post-hashtags">${post.hashtags.map(tag => `<span class="hashtag">#${tag}</span>`).join(' ')}</div>` : ''
+
+      <div class="post-content">${sanitizeHTML(post.content)}</div>
+
+      ${post.media ? `<img src="${sanitizeHTML(post.media)}" class="post-media" alt="Post media">` : ''}
+
+      ${post.hashtags && post.hashtags.length > 0 ?
+        `<div class="post-hashtags">${post.hashtags.map(tag => `<span class="hashtag">#${sanitizeHTML(tag)}</span>`).join(' ')}</div>` : ''
       }
       
       <div class="post-actions">
@@ -526,17 +534,21 @@ function createPostHTML(post) {
         </div>
         
         <div class="comments-list">
-          ${(post.comments || []).map(comment => `
+          ${(post.comments || []).map(comment => {
+            const commentAuthor = sanitizeHTML(comment.author?.displayName || comment.author || 'Anonymous');
+            const commentText = sanitizeHTML(comment.content || comment.text);
+            return `
             <div class="comment">
               <div class="comment-avatar">
-                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author?.displayName || comment.author || 'User')}&background=95a5a6&color=fff" alt="${comment.author?.displayName || comment.author || 'User'}">
+                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(comment.author?.displayName || comment.author || 'User')}&background=95a5a6&color=fff" alt="${commentAuthor}">
               </div>
               <div class="comment-content">
-                <div class="comment-author">${comment.author?.displayName || comment.author || 'Anonymous'}</div>
-                <div class="comment-text">${comment.content || comment.text}</div>
+                <div class="comment-author">${commentAuthor}</div>
+                <div class="comment-text">${commentText}</div>
               </div>
             </div>
-          `).join('')}
+          `;
+          }).join('')}
         </div>
       </div>
     </div>
